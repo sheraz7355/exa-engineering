@@ -15,7 +15,7 @@ export function Team() {
           </h2>
         </Reveal>
 
-        <Stagger className="grid grid-cols-1 md:grid-cols-4 gap-px bg-line border border-line">
+        <Stagger className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-line border border-line">
           {team.map((member) => (
             <StaggerItem key={member.name} className="bg-paper p-8">
               <div className="w-14 h-14 border border-ink flex items-center justify-center font-display font-semibold text-lg mb-6">

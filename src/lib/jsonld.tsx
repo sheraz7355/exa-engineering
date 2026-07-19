@@ -3,7 +3,7 @@
  * for rich results (Organization, WebSite, Service, FAQPage, BreadcrumbList).
  */
 import { siteConfig } from "./site";
-import type { Faq } from "./content";
+import { team, type Faq } from "./content";
 
 const ORG_ID = `${siteConfig.url}/#organization`;
 
@@ -27,7 +27,13 @@ export function organizationLd() {
       addressLocality: siteConfig.contact.city,
       addressCountry: siteConfig.contact.countryCode,
     },
+    hasMap: siteConfig.contact.mapUrl,
     areaServed: { "@type": "Country", name: siteConfig.contact.country },
+    employee: team.map((m) => ({
+      "@type": "Person",
+      name: m.name,
+      jobTitle: m.role,
+    })),
     contactPoint: {
       "@type": "ContactPoint",
       telephone: siteConfig.contact.phone,

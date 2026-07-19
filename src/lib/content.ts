@@ -337,31 +337,24 @@ export const testimonials: Testimonial[] = [
 
 export type TeamMember = { initials: string; name: string; role: string; bio: string };
 
-/** Leadership placeholders — replace names/photos with the real team before launch. */
 export const team: TeamMember[] = [
   {
-    initials: "PE",
-    name: "Principal Engineer",
-    role: "Structural & Civil",
-    bio: "P.E. — leads structural and civil-construction design across roads, bridges, and buildings.",
+    initials: "MA",
+    name: "Muhammad Ashiq",
+    role: "Chief Executive Officer",
+    bio: "Leads Exa Engineering's vision across structural, civil-construction, and solar practices.",
   },
   {
-    initials: "ES",
-    name: "Energy Systems Lead",
-    role: "Solar & Renewables",
-    bio: "Leads utility-scale PV design and grid-integration for industrial solar projects.",
+    initials: "MH",
+    name: "Muhammad Hussnain",
+    role: "Business Manager",
+    bio: "Oversees client engagements, commercial strategy, and day-to-day operations.",
   },
   {
-    initials: "RC",
-    name: "Risk & Compliance",
-    role: "Quality Assurance",
-    bio: "Runs the independent peer-review desk; ISO 31000 lead auditor.",
-  },
-  {
-    initials: "FO",
-    name: "Field Operations",
-    role: "Construction Oversight",
-    bio: "Oversees construction-phase inspection across all active Exa Engineering sites.",
+    initials: "GA",
+    name: "Ghulam Ahmad",
+    role: "Project Manager",
+    bio: "Manages end-to-end project delivery and construction oversight across active sites.",
   },
 ];
 

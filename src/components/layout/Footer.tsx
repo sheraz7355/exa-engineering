@@ -125,7 +125,16 @@ export function Footer({ variant = "main" }: { variant?: "main" | "solar" }) {
         <div>
           <h2 className="mb-4 font-mono text-[11px] uppercase tracking-[0.15em] text-white/50">Contact</h2>
           <ul className="space-y-2 text-sm text-white/70">
-            <li>{siteConfig.contact.address}</li>
+            <li>
+              <a
+                href={siteConfig.contact.mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-signal"
+              >
+                {siteConfig.contact.address}
+              </a>
+            </li>
             <li>
               <a href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`} className="hover:text-signal">
                 {siteConfig.contact.phone}

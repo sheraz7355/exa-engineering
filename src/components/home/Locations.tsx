@@ -1,5 +1,6 @@
 // Locations — four regional desks, engineering-blueprint grid card layout
 import { locations } from "@/lib/content";
+import { siteConfig } from "@/lib/site";
 import { Reveal } from "@/components/ui/Reveal";
 import { Stagger, StaggerItem } from "@/components/ui/Stagger";
 import { SectionLabel } from "@/components/ui/SectionLabel";
@@ -23,6 +24,16 @@ export function Locations() {
                 <div>{location.zone}</div>
                 <div>{location.role}</div>
               </div>
+              {location.role === "Head Office" && (
+                <a
+                  href={siteConfig.contact.mapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-block border-b border-ink pb-0.5 font-mono text-[11px] uppercase tracking-[0.1em] transition-colors hover:border-signal hover:text-signal"
+                >
+                  Get directions →
+                </a>
+              )}
             </StaggerItem>
           ))}
         </Stagger>

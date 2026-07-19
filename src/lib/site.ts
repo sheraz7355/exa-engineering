@@ -8,8 +8,7 @@ export const siteConfig = {
   name: "EXA Engineering",
   legalName: "Exa Engineering (Private) Limited",
   shortName: "EXA",
-  /** Update to the production domain before launch. */
-  url: "https://exaengineering.com",
+  url: "https://exaengineering.org",
   tagline: "Engineering the future of infrastructure.",
   description:
     "Exa Engineering (Private) Limited delivers structural, civil-construction, and utility-scale solar engineering across Pakistan — roads, bridges, underpasses, buildings, and megawatt solar arrays, engineered to spec.",
@@ -17,12 +16,12 @@ export const siteConfig = {
   locale: "en_US",
   contact: {
     email: "info@exaengineering.com",
-    phone: "+92 306 2935768",
-    landline: "+92 42 3644 9602",
+    phone: "+92 314 1444880",
     address: "94-C J1, Johar Town Phase 2, Lahore, Pakistan",
     city: "Lahore",
     country: "Pakistan",
     countryCode: "PK",
+    mapUrl: "https://maps.app.goo.gl/WyNG7RchrvwGPR9eA",
   },
   socials: {
     linkedin: "https://www.linkedin.com/company/exa-engineering",
