@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter, IBM_Plex_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { siteConfig } from "@/lib/site";
 import { EngineeredBg } from "@/components/layout/EngineeredBg";
@@ -82,6 +83,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${display.variable} ${body.variable} ${mono.variable}`}
       suppressHydrationWarning
     >
+      <Script src="https://www.googletagmanager.com/gtag/js?id=G-JCMNH9FNWS" strategy="afterInteractive" />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-JCMNH9FNWS');`}
+      </Script>
       <body className="min-h-screen bg-paper font-body text-ink antialiased">
         <a
           href="#main"
