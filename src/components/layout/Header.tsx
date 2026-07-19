@@ -76,12 +76,13 @@ export function Header({
     "font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft transition-colors hover:text-blueprint";
 
   return (
-    <header
-      className={cn(
-        "fixed top-0 z-50 w-full border-b bg-paper/90 backdrop-blur-md transition-shadow",
-        scrolled ? "border-line shadow-[0_1px_0_rgba(21,24,27,0.06)]" : "border-transparent",
-      )}
-    >
+    <>
+      <header
+        className={cn(
+          "fixed top-0 z-50 w-full border-b bg-paper/90 backdrop-blur-md transition-shadow",
+          scrolled ? "border-line shadow-[0_1px_0_rgba(21,24,27,0.06)]" : "border-transparent",
+        )}
+      >
       <div className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between px-6 md:px-10">
         <Logo href={logoHref} wordmark={wordmark} />
 
@@ -107,6 +108,7 @@ export function Header({
           </svg>
         </button>
       </div>
+      </header>
 
       <AnimatePresence>
         {open && (
@@ -151,6 +153,6 @@ export function Header({
           </>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }

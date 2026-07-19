@@ -128,9 +128,27 @@ export function solarServiceLd() {
   };
 }
 
-/** Renders one or more JSON-LD objects into a script tag. */
+/**
+ * Renders one or more JSON-LD objects into a script tag. Multiple entities are
+ * wrapped in a single `@graph` object (with the `@context` hoisted to the top
+ * level) rather than a bare array, so naive consumers that read `data["@context"]`
+ * don't choke on an array.
+ */
 export function JsonLd({ data }: { data: object | object[] }) {
-  const payload = Array.isArray(data) ? data : [data];
+  const items = Array.isArray(data) ? data : [data];
+  const payload =
+    items.length === 1
+      ? items[0]
+      : {
+          "@context": "https://schema.org",
+          "@graph": items.map((item) => {
+            const rest: Record<string, unknown> = {};
+            for (const [key, value] of Object.entries(item as Record<string, unknown>)) {
+              if (key !== "@context") rest[key] = value;
+            }
+            return rest;
+          }),
+        };
   return (
     <script
       type="application/ld+json"
