@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { siteConfig } from "@/lib/site";
 import { EngineeredBg } from "@/components/layout/EngineeredBg";
+import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { JsonLd, organizationLd, websiteLd } from "@/lib/jsonld";
 
 const display = Space_Grotesk({
@@ -98,6 +99,7 @@ gtag('config', 'G-JCMNH9FNWS');`}
           Skip to content
         </a>
         <EngineeredBg />
+        <ScrollToTop />
         {children}
         <JsonLd data={[organizationLd(), websiteLd()]} />
       </body>

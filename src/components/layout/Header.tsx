@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/Button";
+import { MENU_EVENT } from "./ScrollToTop";
 import { cn } from "@/lib/cn";
 import type { NavItem } from "@/lib/site";
 
@@ -70,6 +71,11 @@ export function Header({
       document.removeEventListener("keydown", onKey);
       toggleEl?.focus();
     };
+  }, [open]);
+
+  // Broadcast menu open/close so the scroll-to-top button can shift aside.
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent(MENU_EVENT, { detail: open }));
   }, [open]);
 
   const linkCls =
