@@ -8,15 +8,22 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to GCP
-        uses: appleboy/ssh-action@v1.2.2
+      - uses: actions/checkout@v6
+
+      - name: Setup SSH key
+        uses: shimataro/ssh-key-action@v2
         with:
-          host: 34.18.23.219
-          username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /var/www/exa-engineering
-            git pull origin main
-            npm ci
-            npm run build
+
+      - name: Add host to known_hosts
+        run: ssh-keyscan -H 34.18.23.219 >> ~/.ssh/known_hosts
+
+      - name: Deploy to GCP
+        run: |
+          ssh ubuntu@34.18.23.219 "
+            cd /var/www/exa-engineering &&
+            git pull origin main &&
+            npm ci &&
+            npm run build &&
             sudo systemctl restart exa-engineering
+          "
