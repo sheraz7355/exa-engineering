@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EXA Engineering | Structural &amp; Energy Infrastructure</title>
+<meta content="Precision structural analysis and renewable energy infrastructure, engineered to spec." name="description"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          paper: '#F2F3EE',
+          'paper-dim': '#E7E8E1',
+          ink: '#15181B',
+          'ink-soft': '#565C60',
+          blueprint: '#1B3A5C',
+          'blueprint-dim': '#274A6E',
+          signal: '#FF4D1C',
+          line: 'rgba(21,24,27,0.14)',
+        },
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['"IBM Plex Mono"', 'monospace'],
+        },
+      },
+    },
+  }
+</script>
+<!-- Three.js ES module -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js"
+  }
+}
+</script>
+<style>
+  html { background: #F2F3EE; }
+  body { font-feature-settings: "tnum" 1; }
+
+  .grid-field {
+    background-image:
+      linear-gradient(to right, rgba(21,24,27,0.055) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(21,24,27,0.055) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .grid-field-dark {
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .sheet { position: relative; }
+  .sheet::before, .sheet::after,
+  .sheet .bl::before, .sheet .br::before { content: ""; position: absolute; width: 14px; height: 14px; z-index: 10; }
+  .sheet::before { top: -1px; left: -1px; border-top: 2px solid var(--bracket, #15181B); border-left: 2px solid var(--bracket, #15181B); }
+  .sheet::after { top: -1px; right: -1px; border-top: 2px solid var(--bracket, #15181B); border-right: 2px solid var(--bracket, #15181B); }
+  .sheet .bl::before { bottom: -1px; left: -1px; border-bottom: 2px solid var(--bracket, #15181B); border-left: 2px solid var(--bracket, #15181B); }
+  .sheet .br::before { bottom: -1px; right: -1px; border-bottom: 2px solid var(--bracket, #15181B); border-right: 2px solid var(--bracket, #15181B); }
+  .sheet-light::before, .sheet-light::after,
+  .sheet-light .bl::before, .sheet-light .br::before { --bracket: rgba(255,255,255,0.5); }
+
+  .leader-line { stroke: rgba(21,24,27,0.4); stroke-width: 1; }
+
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .draw-path { stroke-dasharray: 2000; stroke-dashoffset: 2000; animation: draw 2.4s ease-out forwards; }
+
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+  ::selection { background: #FF4D1C; color: white; }
+
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+  details[open] .accordion-icon { transform: rotate(45deg); }
+
+  #mobile-menu { transform: translateX(100%); transition: transform 0.35s ease; }
+  #mobile-menu.open { transform: translateX(0); }
+
+  /* engineered background canvas */
+  #bg-net { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+  /* 3d model */
+  #model-canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+  #model-canvas:active { cursor: grabbing; }
+
+  /* entrance animation */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-in { animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) both; }
+
+  /* staggered child reveals */
+  .reveal .stagger > * { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.is-visible .stagger > * { opacity: 1; transform: translateY(0); }
+  .stagger > *:nth-child(2) { transition-delay: 0.08s; }
+  .stagger > *:nth-child(3) { transition-delay: 0.16s; }
+  .stagger > *:nth-child(4) { transition-delay: 0.24s; }
+  .stagger > *:nth-child(5) { transition-delay: 0.32s; }
+  .stagger > *:nth-child(6) { transition-delay: 0.40s; }
+  .stagger > *:nth-child(7) { transition-delay: 0.48s; }
+  .stagger > *:nth-child(8) { transition-delay: 0.56s; }
+
+  /* trusted-by marquee */
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  .marquee-track { animation: marquee 30s linear infinite; }
+  .marquee-track:hover { animation-play-state: paused; }
+
+  /* fixed engineered-drawing texture (fades in after the hero) */
+  #engineered-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    opacity: 0; transition: opacity 1.2s ease;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cpath d='M80 72v16M72 80h16' stroke='%231B3A5C' stroke-opacity='0.16' stroke-width='1'/%3E%3C/svg%3E"),
+      linear-gradient(to right, rgba(27,58,92,0.055) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(27,58,92,0.055) 1px, transparent 1px),
+      linear-gradient(to right, rgba(27,58,92,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(27,58,92,0.03) 1px, transparent 1px);
+    background-size: 160px 160px, 160px 160px, 160px 160px, 32px 32px, 32px 32px;
+    mask-image: radial-gradient(ellipse at center, black 55%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 55%, transparent 100%);
+  }
+  #engineered-bg.show { opacity: 1; }
+  main > section, footer { position: relative; z-index: 1; }
+
+  /* classy micro-touches */
+  .sheet { box-shadow: 0 1px 0 rgba(21,24,27,0.06), 0 24px 48px -32px rgba(21,24,27,0.25); }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .floaty { animation: floaty 7s ease-in-out infinite; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .draw-path { animation: none; stroke-dashoffset: 0; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .hero-in { animation: none; }
+    .marquee-track { animation: none; }
+    .reveal .stagger > * { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body class="bg-paper text-ink font-body antialiased">
+<div id="engineered-bg"></div>
+
+<!-- ============ HEADER ============ -->
+<header class="fixed top-0 w-full z-50 bg-paper/90 backdrop-blur-md border-b border-line">
+  <div class="max-w-[1440px] mx-auto flex items-center justify-between h-[76px] px-6 md:px-10">
+    <a href="#" class="flex items-center gap-3">
+      <svg width="34" height="34" viewBox="0 0 36 36" fill="none">
+        <path d="M4.5 12.5 C2.5 6.5 4.5 3 8.5 1.5 C9.5 6.5 8.5 10.5 4.5 12.5 Z" stroke="#15181B" stroke-width="1.4" stroke-linejoin="round"/>
+        <circle cx="26" cy="8.5" r="4" stroke="#FF4D1C" stroke-width="1.4"/>
+        <g stroke="#FF4D1C" stroke-width="1.4" stroke-linecap="round">
+          <line x1="26" y1="1.2" x2="26" y2="2.8"/>
+          <line x1="33.3" y1="8.5" x2="31.7" y2="8.5"/>
+          <line x1="31.2" y1="3.3" x2="30" y2="4.5"/>
+          <line x1="31.2" y1="13.7" x2="30" y2="12.5"/>
+        </g>
+        <path d="M12 16 H27 L32 31 H5 Z" stroke="#1B3A5C" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M17 16 L14 31 M22 16 L23 31 M9.7 21 H28.7 M7.3 26 H30.3" stroke="#1B3A5C" stroke-width="1"/>
+      </svg>
+      <span class="font-display font-semibold tracking-tight text-lg">EXA <span class="font-medium text-ink-soft">ENGINEERING</span></span>
+    </a>
+    <nav class="hidden lg:flex items-center gap-7">
+      <a href="#services" class="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft hover:text-blueprint transition-colors">Structural</a>
+      <a href="energy.html" class="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft hover:text-blueprint transition-colors">Energy</a>
+      <a href="#model" class="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft hover:text-blueprint transition-colors">Model</a>
+      <a href="#process" class="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft hover:text-blueprint transition-colors">Process</a>
+      <a href="#projects" class="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft hover:text-blueprint transition-colors">Projects</a>
+      <a href="#team" class="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft hover:text-blueprint transition-colors">Team</a>
+      <a href="#contact" class="bg-ink text-paper px-5 py-2.5 font-mono text-[12px] uppercase tracking-[0.12em] hover:bg-signal transition-colors">
+        Request Consultation
+      </a>
+    </nav>
+    <button id="menu-btn" class="lg:hidden text-ink" aria-label="Menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.8"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- Mobile nav drawer -->
+<div id="mobile-menu" class="fixed top-0 right-0 h-full w-[78%] max-w-xs bg-ink text-white z-[60] p-8 flex flex-col gap-6 lg:hidden">
+  <button id="menu-close" class="self-end text-white/70" aria-label="Close menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8"/></svg>
+  </button>
+  <a href="#services" class="font-mono text-sm uppercase tracking-[0.12em] text-white/80">Structural</a>
+  <a href="energy.html" class="font-mono text-sm uppercase tracking-[0.12em] text-white/80">Energy</a>
+  <a href="#model" class="font-mono text-sm uppercase tracking-[0.12em] text-white/80">3D Model</a>
+  <a href="#process" class="font-mono text-sm uppercase tracking-[0.12em] text-white/80">Process</a>
+  <a href="#projects" class="font-mono text-sm uppercase tracking-[0.12em] text-white/80">Projects</a>
+  <a href="#team" class="font-mono text-sm uppercase tracking-[0.12em] text-white/80">Team</a>
+  <a href="#locations" class="font-mono text-sm uppercase tracking-[0.12em] text-white/80">Locations</a>
+  <a href="#faq" class="font-mono text-sm uppercase tracking-[0.12em] text-white/80">FAQ</a>
+  <a href="#contact" class="bg-signal text-white text-center px-5 py-3 font-mono text-[12px] uppercase tracking-[0.12em] mt-2">Request Consultation</a>
+</div>
+<div id="menu-backdrop" class="fixed inset-0 bg-black/40 z-[55] hidden lg:hidden"></div>
+
+<main class="pt-[76px]">
+
+  <!-- ============ HERO ============ -->
+  <section class="relative grid-field border-b border-line overflow-hidden">
+    <canvas id="bg-net"></canvas>
+    <div class="relative z-10 max-w-[1440px] mx-auto px-6 md:px-10 py-16 md:py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+      <div>
+        <div class="hero-in font-mono text-[12px] uppercase tracking-[0.2em] text-signal mb-5 flex items-center gap-2">
+          <span class="w-6 h-px bg-signal inline-block"></span>
+          Structural — Energy — Infrastructure
+        </div>
+        <h1 style="animation-delay:0.1s" class="hero-in font-display font-semibold text-[42px] leading-[1.05] md:text-[64px] md:leading-[1.02] tracking-tight mb-6">
+          Engineering the future of infrastructure.
+        </h1>
+        <p style="animation-delay:0.2s" class="hero-in text-ink-soft text-[17px] md:text-lg leading-relaxed max-w-lg mb-9">
+          Precision structural analysis and renewable-energy infrastructure for a rapidly evolving world. Since 2001 we've calculated the stability of tomorrow's landscapes before a single beam is set — from offshore wind arrays to century-span bridges.
+        </p>
+        <div style="animation-delay:0.3s" class="hero-in flex flex-wrap gap-4 mb-12">
+          <a href="#contact" class="bg-signal text-white px-7 py-4 font-mono text-[12px] uppercase tracking-[0.14em] hover:bg-ink transition-colors">
+            Request Consultation
+          </a>
+          <a href="#model" class="border border-ink text-ink px-7 py-4 font-mono text-[12px] uppercase tracking-[0.14em] hover:bg-ink hover:text-paper transition-colors">
+            Explore the 3D Model
+          </a>
+        </div>
+
+        <div style="animation-delay:0.4s" class="hero-in grid grid-cols-3 border-t border-line pt-6 max-w-lg">
+          <div>
+            <div class="font-display font-semibold text-2xl md:text-3xl"><span class="count" data-to="25">0</span>+</div>
+            <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-soft mt-1">Years Practice</div>
+          </div>
+          <div class="border-l border-line pl-5">
+            <div class="font-display font-semibold text-2xl md:text-3xl"><span class="count" data-to="500">0</span>+</div>
+            <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-soft mt-1">Global Projects</div>
+          </div>
+          <div class="border-l border-line pl-5">
+            <div class="font-display font-semibold text-2xl md:text-3xl">24/7</div>
+            <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-soft mt-1">Operations Desk</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signature SVG bridge drawing -->
+      <div style="animation-delay:0.25s" class="hero-in floaty relative sheet bg-white/60 border border-line p-6">
+        <div class="bl"></div><div class="br"></div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="font-mono text-[10px] uppercase tracking-[0.15em] text-ink-soft">DWG NO. EXA—0142</span>
+          <span class="font-mono text-[10px] uppercase tracking-[0.15em] text-ink-soft">SCALE N.T.S.</span>
+        </div>
+        <svg viewBox="0 0 560 420" class="w-full h-auto">
+          <line x1="40" y1="260" x2="520" y2="260" stroke="#15181B" stroke-width="3" class="draw-path"/>
+          <line x1="280" y1="260" x2="280" y2="50" stroke="#15181B" stroke-width="4" class="draw-path"/>
+          <g stroke="#1B3A5C" stroke-width="1.4">
+            <line x1="280" y1="80" x2="90" y2="260" class="draw-path"/>
+            <line x1="280" y1="100" x2="140" y2="260" class="draw-path"/>
+            <line x1="280" y1="120" x2="190" y2="260" class="draw-path"/>
+            <line x1="280" y1="140" x2="240" y2="260" class="draw-path"/>
+            <line x1="280" y1="80" x2="470" y2="260" class="draw-path"/>
+            <line x1="280" y1="100" x2="420" y2="260" class="draw-path"/>
+            <line x1="280" y1="120" x2="370" y2="260" class="draw-path"/>
+            <line x1="280" y1="140" x2="320" y2="260" class="draw-path"/>
+          </g>
+          <line x1="90" y1="260" x2="70" y2="330" stroke="#15181B" stroke-width="2"/>
+          <line x1="470" y1="260" x2="490" y2="330" stroke="#15181B" stroke-width="2"/>
+          <g fill="#FF4D1C">
+            <circle cx="280" cy="260" r="3.5"/>
+            <circle cx="90" cy="260" r="3.5"/>
+            <circle cx="470" cy="260" r="3.5"/>
+          </g>
+          <line x1="40" y1="300" x2="520" y2="300" stroke="rgba(21,24,27,0.4)" stroke-width="1"/>
+          <line x1="40" y1="294" x2="40" y2="306" stroke="rgba(21,24,27,0.4)" stroke-width="1"/>
+          <line x1="520" y1="294" x2="520" y2="306" stroke="rgba(21,24,27,0.4)" stroke-width="1"/>
+          <text x="280" y="318" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#565C60">SPAN 240.0 M</text>
+          <g stroke="#1B3A5C" stroke-width="1.2" fill="none">
+            <path d="M140 235 L140 258" marker-end="url(#arrow)"/>
+            <path d="M380 235 L380 258" marker-end="url(#arrow)"/>
+          </g>
+          <text x="140" y="228" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#1B3A5C">4.2 kN/m²</text>
+          <text x="380" y="228" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#1B3A5C">4.2 kN/m²</text>
+          <line x1="280" y1="60" x2="340" y2="30" class="leader-line"/>
+          <text x="344" y="33" font-family="IBM Plex Mono" font-size="10" fill="#565C60">A36 STEEL PYLON</text>
+          <defs>
+            <marker id="arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#1B3A5C"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ DATA STRIP ============ -->
+  <section class="bg-ink grid-field-dark border-b border-black/40">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10 py-4 flex flex-wrap gap-x-10 gap-y-2 justify-between font-mono text-[11px] uppercase tracking-[0.12em] text-white/70">
+      <span>ISO 9001 CERTIFIED</span>
+      <span>500+ STRUCTURES DELIVERED</span>
+      <span>ZERO LOST-TIME INCIDENTS · 6 YRS</span>
+      <span>OPERATIONS DESK: 24/7/365</span>
+    </div>
+  </section>
+
+  <!-- ============ 3D MODEL SHOWCASE ============ -->
+  <section class="relative bg-ink text-white overflow-hidden border-b border-black/40" id="model">
+    <canvas id="model-bg" class="absolute inset-0 w-full h-full opacity-100"></canvas>
+    <div class="relative max-w-[1440px] mx-auto px-6 md:px-10 py-20 md:py-28 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+
+      <div class="lg:col-span-4 z-10">
+        <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">Interactive Model</span>
+        <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2 mb-6">Inspect the structure.</h2>
+        <p class="text-white/70 leading-relaxed mb-8 max-w-md">
+          A through-truss deck bridge, rendered live from the same geometry our analysis engine solves against. Drag to orbit, or let it turn. Every node is a calculated connection point.
+        </p>
+        <div class="grid grid-cols-2 gap-y-6 gap-x-4 max-w-md mb-8">
+          <div class="border-t border-white/15 pt-4">
+            <div class="font-display font-semibold text-xl"><span class="count" data-to="112">0</span></div>
+            <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/50 mt-1">Connection Nodes</div>
+          </div>
+          <div class="border-t border-white/15 pt-4">
+            <div class="font-display font-semibold text-xl"><span class="count" data-to="284">0</span></div>
+            <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/50 mt-1">Truss Members</div>
+          </div>
+          <div class="border-t border-white/15 pt-4">
+            <div class="font-display font-semibold text-xl">A36</div>
+            <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/50 mt-1">Steel Grade</div>
+          </div>
+          <div class="border-t border-white/15 pt-4">
+            <div class="font-display font-semibold text-xl">1.6×</div>
+            <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/50 mt-1">Safety Factor</div>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <button id="model-rotate" class="border border-white/30 text-white px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.12em] hover:bg-white hover:text-ink transition-colors">Pause Rotation</button>
+          <button id="model-wire" class="border border-white/30 text-white px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.12em] hover:bg-white hover:text-ink transition-colors">Toggle Load View</button>
+        </div>
+      </div>
+
+      <div class="lg:col-span-8 z-10">
+        <div class="sheet sheet-light relative">
+          <div class="bl"></div><div class="br"></div>
+          <div class="border border-white/15 bg-black/20 aspect-[16/11]">
+            <canvas id="model-canvas"></canvas>
+          </div>
+          <div class="flex justify-between font-mono text-[10px] uppercase tracking-[0.1em] text-white/45 mt-3 px-1">
+            <span id="model-status">MODEL EXA—0142 · LIVE RENDER</span>
+            <span>DRAG TO ORBIT</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ TRUSTED BY ============ -->
+  <section class="py-12 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <div class="font-mono text-[11px] uppercase tracking-[0.15em] text-ink-soft mb-6">Trusted by infrastructure &amp; energy operators worldwide</div>
+      <div class="overflow-hidden">
+        <div class="marquee-track flex w-max items-center font-display font-semibold text-xl text-ink/40 whitespace-nowrap">
+          <div class="flex items-center gap-x-12 pr-12 shrink-0">
+            <span>PORTLINE AUTHORITY</span><span>MERIDIAN GRID CO.</span><span>NORTHSTAR RAIL</span><span>CASCADA WORKS</span><span>HELIX URBAN</span><span>VOLTA ENERGY</span>
+          </div>
+          <div class="flex items-center gap-x-12 pr-12 shrink-0" aria-hidden="true">
+            <span>PORTLINE AUTHORITY</span><span>MERIDIAN GRID CO.</span><span>NORTHSTAR RAIL</span><span>CASCADA WORKS</span><span>HELIX URBAN</span><span>VOLTA ENERGY</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SERVICES ============ -->
+  <section class="py-20 md:py-28 border-b border-line" id="services">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-14 gap-4">
+        <div>
+          <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">Core Capabilities</span>
+          <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2">Technical specializations.</h2>
+        </div>
+        <p class="text-ink-soft max-w-sm">Three disciplines, one calculation standard — every deliverable is peer-reviewed and load-tested before it leaves the office.</p>
+      </div>
+
+      <div class="stagger grid grid-cols-1 md:grid-cols-3 gap-px bg-line border border-line mb-4">
+        <div class="bg-paper p-8 hover:bg-white transition-colors group">
+          <div class="flex items-center justify-between mb-8">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#15181B" stroke-width="1.5"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 12h.01M15 12h.01M9 9h.01M15 9h.01"/></svg>
+            <span class="font-mono text-[10px] text-ink-soft group-hover:text-signal transition-colors">SPEC / STR</span>
+          </div>
+          <h3 class="font-display font-semibold text-xl mb-3">Structural Systems</h3>
+          <p class="text-ink-soft text-[15px] leading-relaxed mb-6">
+            Load-bearing analysis and structural integrity audits for high-rise and industrial complexes, run against live seismic and wind-load models.
+          </p>
+          <a href="#" class="inline-flex items-center gap-1 font-mono text-[12px] uppercase tracking-[0.12em] border-b border-ink pb-0.5 group-hover:border-signal group-hover:text-signal transition-colors">Learn more →</a>
+        </div>
+        <div class="bg-paper p-8 hover:bg-white transition-colors group" id="energy">
+          <div class="flex items-center justify-between mb-8">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#15181B" stroke-width="1.5"><path d="M13 2 L4 14h6l-1 8 9-12h-6z"/></svg>
+            <span class="font-mono text-[10px] text-ink-soft group-hover:text-signal transition-colors">SPEC / ENR</span>
+          </div>
+          <h3 class="font-display font-semibold text-xl mb-3">Renewable Energy</h3>
+          <p class="text-ink-soft text-[15px] leading-relaxed mb-6">
+            Integration of offshore wind foundations and utility-scale photovoltaic arrays into existing grid infrastructure.
+          </p>
+          <a href="energy.html" class="inline-flex items-center gap-1 font-mono text-[12px] uppercase tracking-[0.12em] border-b border-ink pb-0.5 group-hover:border-signal group-hover:text-signal transition-colors">Learn more →</a>
+        </div>
+        <div class="bg-paper p-8 hover:bg-white transition-colors group">
+          <div class="flex items-center justify-between mb-8">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#15181B" stroke-width="1.5"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 4v16"/></svg>
+            <span class="font-mono text-[10px] text-ink-soft group-hover:text-signal transition-colors">SPEC / CNS</span>
+          </div>
+          <h3 class="font-display font-semibold text-xl mb-3">Precision Consulting</h3>
+          <p class="text-ink-soft text-[15px] leading-relaxed mb-6">
+            Data-driven feasibility studies and risk-management protocols for high-stakes engineering programs.
+          </p>
+          <a href="#" class="inline-flex items-center gap-1 font-mono text-[12px] uppercase tracking-[0.12em] border-b border-ink pb-0.5 group-hover:border-signal group-hover:text-signal transition-colors">Learn more →</a>
+        </div>
+      </div>
+
+      <div class="border border-line overflow-x-auto">
+        <table class="w-full text-left border-collapse min-w-[640px]">
+          <thead>
+            <tr class="bg-ink text-white font-mono text-[11px] uppercase tracking-[0.1em]">
+              <th class="p-4 font-medium">Capability</th>
+              <th class="p-4 font-medium">Typical Scale</th>
+              <th class="p-4 font-medium">Standards</th>
+              <th class="p-4 font-medium">Delivery</th>
+            </tr>
+          </thead>
+          <tbody class="font-mono text-[13px]">
+            <tr class="border-t border-line">
+              <td class="p-4 font-semibold">Structural Systems</td>
+              <td class="p-4 text-ink-soft">Up to 120 storeys</td>
+              <td class="p-4 text-ink-soft">ASCE 7, Eurocode 8</td>
+              <td class="p-4 text-ink-soft">8–14 weeks</td>
+            </tr>
+            <tr class="border-t border-line bg-paper-dim/60">
+              <td class="p-4 font-semibold">Renewable Energy</td>
+              <td class="p-4 text-ink-soft">50–800 MW arrays</td>
+              <td class="p-4 text-ink-soft">IEC 61400, DNV-ST</td>
+              <td class="p-4 text-ink-soft">12–20 weeks</td>
+            </tr>
+            <tr class="border-t border-line">
+              <td class="p-4 font-semibold">Precision Consulting</td>
+              <td class="p-4 text-ink-soft">Any project scale</td>
+              <td class="p-4 text-ink-soft">ISO 9001, ISO 31000</td>
+              <td class="p-4 text-ink-soft">2–6 weeks</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ METRICS BAND (animated counters) ============ -->
+  <section class="py-20 md:py-24 bg-blueprint grid-field-dark border-b border-black/30">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <div class="stagger grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10 border border-white/10">
+        <div class="bg-blueprint p-8">
+          <div class="font-display font-semibold text-white text-4xl md:text-5xl"><span class="count" data-to="1240">0</span></div>
+          <div class="font-mono text-[10px] uppercase tracking-[0.12em] text-white/55 mt-2">Metres of Span Analysed</div>
+        </div>
+        <div class="bg-blueprint p-8">
+          <div class="font-display font-semibold text-white text-4xl md:text-5xl"><span class="count" data-to="3800">0</span></div>
+          <div class="font-mono text-[10px] uppercase tracking-[0.12em] text-white/55 mt-2">MW Energy Capacity Enabled</div>
+        </div>
+        <div class="bg-blueprint p-8">
+          <div class="font-display font-semibold text-white text-4xl md:text-5xl"><span class="count" data-to="42">0</span></div>
+          <div class="font-mono text-[10px] uppercase tracking-[0.12em] text-white/55 mt-2">Countries Delivered In</div>
+        </div>
+        <div class="bg-blueprint p-8">
+          <div class="font-display font-semibold text-white text-4xl md:text-5xl"><span class="count" data-to="0">0</span></div>
+          <div class="font-mono text-[10px] uppercase tracking-[0.12em] text-white/55 mt-2">Structural Failures On Record</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROCESS ============ -->
+  <section class="py-20 md:py-28 bg-paper-dim border-b border-line" id="process">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <div class="mb-16">
+        <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">How We Deliver</span>
+        <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2">A four-stage sequence, every time.</h2>
+        <p class="text-ink-soft max-w-xl mt-4">No shortcuts between site data and signed-off structure. Each stage closes with a written sign-off before the next begins.</p>
+      </div>
+
+      <div class="stagger relative grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-6">
+        <div class="hidden md:block absolute top-0 left-0 right-0 h-px bg-line"></div>
+        <div class="relative pt-8">
+          <div class="hidden md:flex w-3 h-3 rounded-full bg-signal absolute -top-[6px] left-0 ring-4 ring-paper-dim"></div>
+          <div class="font-mono text-signal text-sm mb-4">STAGE 01</div>
+          <h3 class="font-display font-semibold text-lg mb-2">Survey &amp; Site Data</h3>
+          <p class="text-ink-soft text-sm leading-relaxed">Geotechnical surveys, LiDAR scans, and load-history data collected on site.</p>
+        </div>
+        <div class="relative pt-8">
+          <div class="hidden md:flex w-3 h-3 rounded-full bg-signal absolute -top-[6px] left-0 ring-4 ring-paper-dim"></div>
+          <div class="font-mono text-signal text-sm mb-4">STAGE 02</div>
+          <h3 class="font-display font-semibold text-lg mb-2">Structural Modeling</h3>
+          <p class="text-ink-soft text-sm leading-relaxed">Finite-element analysis against seismic, wind, and live-load scenarios.</p>
+        </div>
+        <div class="relative pt-8">
+          <div class="hidden md:flex w-3 h-3 rounded-full bg-signal absolute -top-[6px] left-0 ring-4 ring-paper-dim"></div>
+          <div class="font-mono text-signal text-sm mb-4">STAGE 03</div>
+          <h3 class="font-display font-semibold text-lg mb-2">Validation &amp; Testing</h3>
+          <p class="text-ink-soft text-sm leading-relaxed">Independent peer review and physical load-testing of critical assemblies.</p>
+        </div>
+        <div class="relative pt-8">
+          <div class="hidden md:flex w-3 h-3 rounded-full bg-signal absolute -top-[6px] left-0 ring-4 ring-paper-dim"></div>
+          <div class="font-mono text-signal text-sm mb-4">STAGE 04</div>
+          <h3 class="font-display font-semibold text-lg mb-2">Construction Oversight</h3>
+          <p class="text-ink-soft text-sm leading-relaxed">On-site inspection through to final commissioning and as-built sign-off.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT / STANDARDS ============ -->
+  <section class="py-20 md:py-28 border-b border-line" id="about">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+      <div class="sheet order-2 lg:order-1">
+        <div class="bl"></div><div class="br"></div>
+        <img class="w-full h-auto grayscale hover:grayscale-0 transition-all duration-500 border border-line" alt="Structural engineers inspecting a 3D printed architectural model in a modern laboratory" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdMAUaNa6gqlO8U47l9uhAVsT05YYmtfXulA3rvlG6CujAZF0FRiMzmfcdB6CurgYCXj0NG_UOXMtxfJVMGv9ZQOsuLC_eakFTLwFDbGJgUOWRO-ShgbWdjXIKGT3s6iR5rYQ-v1VUaKog7nG3juMwjpTkj2fWa93Z8-INvjrZJZdgr4xyuEe7N5bOQGPRWyNihQSYYtyFjIRhDS3d3CsGjZgKsXundOnVHJta4UP77t-eQGniN4YWjW3UUALm-bxYcMykjbFwRUY"/>
+        <div class="flex justify-between font-mono text-[10px] uppercase tracking-[0.1em] text-ink-soft mt-3 px-1">
+          <span>FIG. 03 — MODEL REVIEW, BAY 2</span>
+          <span>REV. A</span>
+        </div>
+      </div>
+      <div class="order-1 lg:order-2">
+        <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">Our Standards</span>
+        <h2 class="font-display font-semibold text-3xl md:text-[40px] tracking-tight mt-2 mb-6">Technical rigor, by the numbers.</h2>
+        <p class="text-ink-soft text-lg leading-relaxed mb-8 max-w-lg">
+          We don't just build; we optimize. Every EXA deliverable is rooted in mathematical certainty and environmental stewardship, checked twice before it's signed.
+        </p>
+        <ul class="space-y-6 max-w-lg">
+          <li class="flex items-start gap-4 border-t border-line pt-5">
+            <span class="font-mono text-signal text-sm mt-0.5">01</span>
+            <div><strong class="font-display font-semibold block mb-1">ISO 9001 Certified</strong>
+            <p class="text-ink-soft text-sm leading-relaxed">Adhering to global quality-management systems for zero-defect results.</p></div>
+          </li>
+          <li class="flex items-start gap-4 border-t border-line pt-5">
+            <span class="font-mono text-signal text-sm mt-0.5">02</span>
+            <div><strong class="font-display font-semibold block mb-1">Data-Driven Design</strong>
+            <p class="text-ink-soft text-sm leading-relaxed">Predictive modeling ensures structural longevity and long-term safety margins.</p></div>
+          </li>
+          <li class="flex items-start gap-4 border-t border-line pt-5">
+            <span class="font-mono text-signal text-sm mt-0.5">03</span>
+            <div><strong class="font-display font-semibold block mb-1">Independent Peer Review</strong>
+            <p class="text-ink-soft text-sm leading-relaxed">Every critical calculation is checked by a second licensed engineer.</p></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURED CASE STUDY ============ -->
+  <section class="py-20 md:py-28 bg-ink text-white border-b border-black/40 grid-field-dark">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">Featured Case Study</span>
+      <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2 mb-12 max-w-2xl">Neo-Link Smart Bridge</h2>
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-10 items-start">
+        <div class="lg:col-span-3 sheet sheet-light">
+          <div class="bl"></div><div class="br"></div>
+          <div class="aspect-[16/10] bg-cover bg-center border border-white/15" style="background-image:url('https://lh3.googleusercontent.com/aida-public/AB6AXuDrsuaSsJuztnMsev7Bi6HQp-0OZDz34CWqbqUDFqBvulbgwcehbkB4Vj_DKCVts2g4P_TUN5r_4guXtmqys-wJjOkVf-Ov2zFHrJT9ELcmfCPb444r6QFT1BlsxOUNQB37h--9kKNcNt18oNi0KwymPYmBBvhYVIxmm0sDYd4WLPucabj2imZtM2183H0HJTQJq-gebOsp93SkXNCTY8C8CP2OMrhliihzwYR0xzmZeR93qZOjT9zZ32noumMthPjrOnh42ExVRI0')"></div>
+        </div>
+        <div class="lg:col-span-2">
+          <p class="text-white/70 leading-relaxed mb-8">
+            A cantilevered river crossing carrying both rail and pedestrian traffic, instrumented end-to-end with fibre-optic strain sensors that feed our operations desk in real time. Delivered fourteen weeks ahead of the original civic schedule.
+          </p>
+          <div class="grid grid-cols-2 gap-6 mb-8">
+            <div class="border-t border-white/15 pt-4"><div class="font-display font-semibold text-2xl">1,140 m</div><div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/50 mt-1">Total Span</div></div>
+            <div class="border-t border-white/15 pt-4"><div class="font-display font-semibold text-2xl">2025</div><div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/50 mt-1">Commissioned</div></div>
+            <div class="border-t border-white/15 pt-4"><div class="font-display font-semibold text-2xl">40k</div><div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/50 mt-1">Daily Crossings</div></div>
+            <div class="border-t border-white/15 pt-4"><div class="font-display font-semibold text-2xl">210</div><div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/50 mt-1">Strain Sensors</div></div>
+          </div>
+          <blockquote class="border-l-2 border-signal pl-5 text-white/80 italic">
+            "EXA's instrumentation plan is why our maintenance budget dropped twenty percent in year one."
+            <footer class="not-italic font-mono text-[11px] uppercase tracking-[0.1em] text-white/50 mt-3">— R. Okafor, Director of Transit Infrastructure</footer>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROJECTS ============ -->
+  <section class="py-20 md:py-28 border-b border-line" id="projects">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <div class="flex justify-between items-end mb-12">
+        <div>
+          <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">Our Portfolio</span>
+          <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2">Engineering feats.</h2>
+        </div>
+        <a href="#" class="hidden md:inline font-mono text-[12px] uppercase tracking-[0.12em] border-b border-ink pb-1 hover:text-signal hover:border-signal transition-colors">View all projects →</a>
+      </div>
+      <div class="stagger grid grid-cols-1 md:grid-cols-2 gap-px bg-line border border-line">
+        <div class="relative group overflow-hidden cursor-pointer bg-ink">
+          <div class="aspect-video bg-cover bg-center opacity-90 transition-transform duration-700 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAI4AeQ0tWkR7TaRXjXoUh8srIxs1wsvdgSQ1GRCzMu2xrdFsgdNSDgz9lbbgTkYAEFzD__2xu_wNolul3QLQ6oUsjRjHl35jRV1byXd4WZ31eXEJpMShhHsNmk1L6TMwlwrfM1LM7hzUUDdykpCkW4js_QsvczSBkkZl4UXZjxqGjXX4le8z4g8kkWdSbX9sIA3GbWyUCQDZaK0mAXx1JR0nP5gp_RIqIsZ6VM7BgUUBIJ2FTl91eIzUI3vB2IXpo15aNe39wB5GU')"></div>
+          <div class="absolute inset-0 bg-blueprint/0 group-hover:bg-blueprint/30 transition-colors"></div>
+          <div class="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.1em] text-white/80 bg-black/40 px-2 py-1">RENEWABLE ENERGY</div>
+          <div class="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/70 to-transparent"><h4 class="font-display font-semibold text-white text-lg">North Sea Wind Array</h4></div>
+        </div>
+        <div class="relative group overflow-hidden cursor-pointer bg-ink">
+          <div class="aspect-video bg-cover bg-center opacity-90 transition-transform duration-700 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuByJUSmdMooGrKfhBf9l2DQqiMQ0CKAs86Fr6GnxBjo5tAfrQetjZ17vrgyqumAirxOz2uLlk0DChAD3gxNPNntfB9Qk1oPq73lBEPTNfLmjm1FXPNTyHJeb6_ClL_jYRZLexSCNGxWZd5FlscYouRV57D03ogSUTvE5HJL5eArVq6mKvSdpNcVCI8fEdG85Hf9d0W-gWy_YvWQuLUCrGrI0zoEEx4v2gDxBDsk8daQX4UiM0_ulFO3rwoAmSWhPdoOYyUSpjoGkj4')"></div>
+          <div class="absolute inset-0 bg-blueprint/0 group-hover:bg-blueprint/30 transition-colors"></div>
+          <div class="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.1em] text-white/80 bg-black/40 px-2 py-1">STRUCTURAL</div>
+          <div class="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/70 to-transparent"><h4 class="font-display font-semibold text-white text-lg">The Helix Tower Bracing</h4></div>
+        </div>
+        <div class="relative group overflow-hidden cursor-pointer bg-ink">
+          <div class="aspect-video bg-cover bg-center opacity-90 transition-transform duration-700 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAFhWQj2yFEp7mOUcc6qemKNEKF_VpHEYXQxsuw7pCVq8h_UvrC7EcJ_40hCkSH6f95sz2idipKv2foevD7tr_xJjm8yKL226dzQ4O7HaOd7cHKTgopLRBtpj_vhpnpQCGdOh8Ozw9FHiG370k06bXleFY3I5BU6XYEYCSG0-9MZYVE1f8IsBPlVE9FKq6aOmB4oLTodozw3IhpuKlpK3uZDfFOmxFnFw_87-GzqT-PmqD0m6BE8LdDCwMCcGUhgNNnyF02ugXkKhU')"></div>
+          <div class="absolute inset-0 bg-blueprint/0 group-hover:bg-blueprint/30 transition-colors"></div>
+          <div class="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.1em] text-white/80 bg-black/40 px-2 py-1">ENERGY</div>
+          <div class="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/70 to-transparent"><h4 class="font-display font-semibold text-white text-lg">Cascada Dam Modernization</h4></div>
+        </div>
+        <div class="relative group overflow-hidden cursor-pointer bg-ink">
+          <div class="aspect-video bg-cover bg-center opacity-90 transition-transform duration-700 group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDrsuaSsJuztnMsev7Bi6HQp-0OZDz34CWqbqUDFqBvulbgwcehbkB4Vj_DKCVts2g4P_TUN5r_4guXtmqys-wJjOkVf-Ov2zFHrJT9ELcmfCPb444r6QFT1BlsxOUNQB37h--9kKNcNt18oNi0KwymPYmBBvhYVIxmm0sDYd4WLPucabj2imZtM2183H0HJTQJq-gebOsp93SkXNCTY8C8CP2OMrhliihzwYR0xzmZeR93qZOjT9zZ32noumMthPjrOnh42ExVRI0')"></div>
+          <div class="absolute inset-0 bg-blueprint/0 group-hover:bg-blueprint/30 transition-colors"></div>
+          <div class="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.1em] text-white/80 bg-black/40 px-2 py-1">INFRASTRUCTURE</div>
+          <div class="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/70 to-transparent"><h4 class="font-display font-semibold text-white text-lg">Neo-Link Smart Bridge</h4></div>
+        </div>
+      </div>
+      <a href="#" class="md:hidden mt-8 inline-block font-mono text-[12px] uppercase tracking-[0.12em] border-b border-ink pb-1">View all projects →</a>
+    </div>
+  </section>
+
+  <!-- ============ MILESTONES ============ -->
+  <section class="py-20 md:py-28 bg-paper-dim border-b border-line" id="history">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">Track Record</span>
+      <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2 mb-14">Two decades of load paths.</h2>
+      <div class="border-t border-line">
+        <div class="grid grid-cols-1 md:grid-cols-[120px_1fr] gap-x-8 py-6 border-b border-line group hover:bg-paper transition-colors">
+          <div class="font-mono text-signal text-lg">2001</div>
+          <div><h3 class="font-display font-semibold text-lg mb-1">Founded in Rotterdam</h3><p class="text-ink-soft text-sm max-w-2xl">Three structural engineers open a two-room practice above a shipyard, taking on port and canal work.</p></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-[120px_1fr] gap-x-8 py-6 border-b border-line group hover:bg-paper transition-colors">
+          <div class="font-mono text-signal text-lg">2009</div>
+          <div><h3 class="font-display font-semibold text-lg mb-1">First offshore wind commission</h3><p class="text-ink-soft text-sm max-w-2xl">Foundation design for a 120 MW North Sea array marks EXA's move into renewable-energy infrastructure.</p></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-[120px_1fr] gap-x-8 py-6 border-b border-line group hover:bg-paper transition-colors">
+          <div class="font-mono text-signal text-lg">2016</div>
+          <div><h3 class="font-display font-semibold text-lg mb-1">Opened Singapore &amp; Houston desks</h3><p class="text-ink-soft text-sm max-w-2xl">Global operations desk goes 24/7, with follow-the-sun review across three time zones.</p></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-[120px_1fr] gap-x-8 py-6 border-b border-line group hover:bg-paper transition-colors">
+          <div class="font-mono text-signal text-lg">2025</div>
+          <div><h3 class="font-display font-semibold text-lg mb-1">Neo-Link Smart Bridge commissioned</h3><p class="text-ink-soft text-sm max-w-2xl">A fully instrumented river crossing becomes EXA's 500th delivered structure.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIALS ============ -->
+  <section class="py-20 md:py-28 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">Client Notes</span>
+      <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2 mb-14">Read directly from the field.</h2>
+      <div class="stagger grid grid-cols-1 md:grid-cols-3 gap-px bg-line border border-line">
+        <div class="bg-paper p-8"><p class="text-ink-soft leading-relaxed mb-6">"The load-testing report EXA handed over was more thorough than anything our own compliance office produces internally."</p><div class="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft border-t border-line pt-4">M. Sørensen — Meridian Grid Co.</div></div>
+        <div class="bg-paper p-8"><p class="text-ink-soft leading-relaxed mb-6">"They caught a foundation clearance issue eight weeks before groundbreaking. That single review paid for the whole engagement."</p><div class="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft border-t border-line pt-4">J. Alvarez — Cascada Works</div></div>
+        <div class="bg-paper p-8"><p class="text-ink-soft leading-relaxed mb-6">"Every drawing came back annotated to the millimetre. Our contractors stopped asking for clarifications altogether."</p><div class="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft border-t border-line pt-4">P. Reyes — Northstar Rail</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEAM ============ -->
+  <section class="py-20 md:py-28 bg-paper-dim border-b border-line" id="team">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">Leadership</span>
+      <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2 mb-14">The engineers of record.</h2>
+      <div class="stagger grid grid-cols-1 md:grid-cols-4 gap-px bg-line border border-line">
+        <div class="bg-paper p-8"><div class="w-14 h-14 border border-ink flex items-center justify-center font-display font-semibold text-lg mb-6">NT</div><h3 class="font-display font-semibold text-lg mb-1">Nadia Torres</h3><div class="font-mono text-[11px] uppercase tracking-[0.1em] text-signal mb-3">Principal, Structural</div><p class="text-ink-soft text-sm leading-relaxed">P.E., 22 years in high-rise seismic design across four continents.</p></div>
+        <div class="bg-paper p-8"><div class="w-14 h-14 border border-ink flex items-center justify-center font-display font-semibold text-lg mb-6">DK</div><h3 class="font-display font-semibold text-lg mb-1">Daniel Kessler</h3><div class="font-mono text-[11px] uppercase tracking-[0.1em] text-signal mb-3">Principal, Energy Systems</div><p class="text-ink-soft text-sm leading-relaxed">Leads offshore foundation design; former grid-integration lead at Volta Energy.</p></div>
+        <div class="bg-paper p-8"><div class="w-14 h-14 border border-ink flex items-center justify-center font-display font-semibold text-lg mb-6">AO</div><h3 class="font-display font-semibold text-lg mb-1">Amara Osei</h3><div class="font-mono text-[11px] uppercase tracking-[0.1em] text-signal mb-3">Director, Risk &amp; Compliance</div><p class="text-ink-soft text-sm leading-relaxed">Runs the independent peer-review desk; ISO 31000 lead auditor.</p></div>
+        <div class="bg-paper p-8"><div class="w-14 h-14 border border-ink flex items-center justify-center font-display font-semibold text-lg mb-6">LW</div><h3 class="font-display font-semibold text-lg mb-1">Liam Whitfield</h3><div class="font-mono text-[11px] uppercase tracking-[0.1em] text-signal mb-3">Director, Field Operations</div><p class="text-ink-soft text-sm leading-relaxed">Oversees construction-phase inspection across all active EXA sites.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LOCATIONS ============ -->
+  <section class="py-20 md:py-28 border-b border-line" id="locations">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">Global Reach</span>
+      <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2 mb-14">Four desks, one standard.</h2>
+      <div class="stagger grid grid-cols-1 md:grid-cols-4 gap-px bg-line border border-line">
+        <div class="bg-paper p-6"><h3 class="font-display font-semibold text-lg mb-3">Rotterdam</h3><div class="font-mono text-[11px] text-ink-soft space-y-1"><div>51.9225° N, 4.4792° E</div><div>HQ — CET</div><div>Structural &amp; Energy</div></div></div>
+        <div class="bg-paper p-6"><h3 class="font-display font-semibold text-lg mb-3">Singapore</h3><div class="font-mono text-[11px] text-ink-soft space-y-1"><div>1.3521° N, 103.8198° E</div><div>APAC — SGT</div><div>Structural &amp; Consulting</div></div></div>
+        <div class="bg-paper p-6"><h3 class="font-display font-semibold text-lg mb-3">Houston</h3><div class="font-mono text-[11px] text-ink-soft space-y-1"><div>29.7604° N, 95.3698° W</div><div>Americas — CST</div><div>Energy Systems</div></div></div>
+        <div class="bg-paper p-6"><h3 class="font-display font-semibold text-lg mb-3">Santiago</h3><div class="font-mono text-[11px] text-ink-soft space-y-1"><div>33.4489° S, 70.6693° W</div><div>LatAm — CLT</div><div>Structural &amp; Field Ops</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="py-20 md:py-28 border-b border-line" id="faq">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div>
+        <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">FAQ</span>
+        <h2 class="font-display font-semibold text-3xl md:text-[40px] tracking-tight mt-2">Common questions.</h2>
+        <p class="text-ink-soft mt-4 max-w-xs">Don't see your question here — reach the operations desk directly.</p>
+      </div>
+      <div class="lg:col-span-2 divide-y divide-line border-t border-b border-line">
+        <details class="group py-6"><summary class="flex items-center justify-between gap-4"><span class="font-display font-semibold text-lg">What project sizes do you take on?</span><span class="accordion-icon text-signal text-2xl leading-none transition-transform">+</span></summary><p class="text-ink-soft mt-4 leading-relaxed max-w-2xl">From single-structure feasibility studies to multi-hundred-megawatt energy programs. Scope is set in the first consultation, and every engagement gets the same peer-review process regardless of size.</p></details>
+        <details class="group py-6"><summary class="flex items-center justify-between gap-4"><span class="font-display font-semibold text-lg">Which standards do your calculations follow?</span><span class="accordion-icon text-signal text-2xl leading-none transition-transform">+</span></summary><p class="text-ink-soft mt-4 leading-relaxed max-w-2xl">ASCE 7, Eurocode, IEC 61400, and DNV standards depending on jurisdiction and asset type — always the local governing code plus our own internal margin above it.</p></details>
+        <details class="group py-6"><summary class="flex items-center justify-between gap-4"><span class="font-display font-semibold text-lg">Do you provide construction-phase oversight?</span><span class="accordion-icon text-signal text-2xl leading-none transition-transform">+</span></summary><p class="text-ink-soft mt-4 leading-relaxed max-w-2xl">Yes — Stage 04 of our process places a field engineer on site through commissioning, with weekly as-built reconciliation against the approved model.</p></details>
+        <details class="group py-6"><summary class="flex items-center justify-between gap-4"><span class="font-display font-semibold text-lg">How quickly can you start a feasibility review?</span><span class="accordion-icon text-signal text-2xl leading-none transition-transform">+</span></summary><p class="text-ink-soft mt-4 leading-relaxed max-w-2xl">Typically within two weeks of a signed engagement letter, sooner for existing clients with data already on file with our operations desk.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="py-24 bg-blueprint grid-field-dark border-b border-black/30" id="contact">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10 text-center">
+      <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-white/60">Start a Project</span>
+      <h2 class="font-display font-semibold text-white text-3xl md:text-[48px] tracking-tight mt-3 mb-5">Ready to build the future?</h2>
+      <p class="text-white/70 text-lg max-w-xl mx-auto mb-10">Partner with us for world-class structural engineering and infrastructure consulting.</p>
+      <a href="#" class="inline-block bg-signal text-white px-10 py-5 font-mono text-[12px] uppercase tracking-[0.16em] hover:bg-white hover:text-blueprint transition-colors">Get Started Today</a>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="bg-ink text-white">
+  <div class="max-w-[1440px] mx-auto px-6 md:px-10 py-16 grid grid-cols-1 md:grid-cols-6 gap-10">
+    <div class="md:col-span-2">
+      <div class="font-display font-semibold text-lg mb-1">EXA ENGINEERING</div>
+      <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/40 mb-4">Exa Engineering (Private) Limited</div>
+      <p class="text-white/60 text-sm leading-relaxed max-w-xs mb-6">Global structural solutions for the most challenging technical environments on Earth.</p>
+      <form class="flex border border-white/20" onsubmit="return false;">
+        <input type="email" placeholder="you@company.com" class="bg-transparent px-3 py-2.5 text-sm text-white placeholder-white/40 flex-1 min-w-0 outline-none font-mono" />
+        <button class="bg-signal px-4 font-mono text-[11px] uppercase tracking-[0.1em] shrink-0">Subscribe</button>
+      </form>
+      <p class="font-mono text-[10px] text-white/40 mt-2 uppercase tracking-[0.08em]">Monthly notes from the operations desk.</p>
+    </div>
+    <div><h5 class="font-mono text-[11px] uppercase tracking-[0.15em] text-white/50 mb-4">Sectors</h5><ul class="space-y-2 text-sm"><li><a href="#" class="text-white/70 hover:text-signal transition-colors">Infrastructure</a></li><li><a href="energy.html" class="text-white/70 hover:text-signal transition-colors">Energy</a></li><li><a href="#" class="text-white/70 hover:text-signal transition-colors">Civil</a></li></ul></div>
+    <div><h5 class="font-mono text-[11px] uppercase tracking-[0.15em] text-white/50 mb-4">Company</h5><ul class="space-y-2 text-sm"><li><a href="#team" class="text-white/70 hover:text-signal transition-colors">Leadership</a></li><li><a href="#history" class="text-white/70 hover:text-signal transition-colors">History</a></li><li><a href="#" class="text-white/70 hover:text-signal transition-colors">Careers</a></li><li><a href="#locations" class="text-white/70 hover:text-signal transition-colors">Locations</a></li></ul></div>
+    <div><h5 class="font-mono text-[11px] uppercase tracking-[0.15em] text-white/50 mb-4">Resources</h5><ul class="space-y-2 text-sm"><li><a href="#model" class="text-white/70 hover:text-signal transition-colors">3D Model</a></li><li><a href="#process" class="text-white/70 hover:text-signal transition-colors">Our Process</a></li><li><a href="#faq" class="text-white/70 hover:text-signal transition-colors">FAQ</a></li></ul></div>
+    <div><h5 class="font-mono text-[11px] uppercase tracking-[0.15em] text-white/50 mb-4">Legal</h5><ul class="space-y-2 text-sm"><li><a href="#" class="text-white/70 hover:text-signal transition-colors">Privacy Policy</a></li><li><a href="#" class="text-white/70 hover:text-signal transition-colors">Terms of Service</a></li><li><a href="#" class="text-white/70 hover:text-signal transition-colors">Compliance</a></li></ul></div>
+  </div>
+  <div class="border-t border-white/10">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10 py-5 flex flex-col md:flex-row justify-between gap-2 font-mono text-[11px] uppercase tracking-[0.1em] text-white/40">
+      <span>© 2026 Exa Engineering (Private) Limited. All rights reserved.</span>
+      <span>DWG NO. EXA-2026-001 · REV A</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ UI SCRIPT ============ -->
+<script>
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 76, behavior: 'smooth' });
+        document.getElementById('mobile-menu').classList.remove('open');
+        document.getElementById('menu-backdrop').classList.add('hidden');
+      }
+    });
+  });
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('is-visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('section').forEach(s => { s.classList.add('reveal'); io.observe(s); });
+
+  // count-up
+  const fmt = n => n.toLocaleString('en-US');
+  const countIO = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target; countIO.unobserve(el);
+      const to = parseInt(el.dataset.to, 10); const dur = 1400; const t0 = performance.now();
+      if (to === 0) { el.textContent = '0'; return; }
+      const step = (t) => {
+        const p = Math.min((t - t0) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = fmt(Math.round(to * eased));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.count').forEach(c => countIO.observe(c));
+
+  // mobile menu
+  const menuBtn = document.getElementById('menu-btn');
+  const menuClose = document.getElementById('menu-close');
+  const menu = document.getElementById('mobile-menu');
+  const backdrop = document.getElementById('menu-backdrop');
+  const openMenu = () => { menu.classList.add('open'); backdrop.classList.remove('hidden'); };
+  const closeMenu = () => { menu.classList.remove('open'); backdrop.classList.add('hidden'); };
+  menuBtn.addEventListener('click', openMenu);
+  menuClose.addEventListener('click', closeMenu);
+  backdrop.addEventListener('click', closeMenu);
+
+  // engineered texture fades in once past the hero
+  const engBg = document.getElementById('engineered-bg');
+  if (engBg) {
+    const onScroll = () => engBg.classList.toggle('show', window.scrollY > innerHeight * 0.5);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  // hero engineered node-network background (2D canvas)
+  (function () {
+    const canvas = document.getElementById('bg-net');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let w, h, pts, raf;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function resize() {
+      const r = canvas.getBoundingClientRect();
+      w = canvas.width = r.width * devicePixelRatio;
+      h = canvas.height = r.height * devicePixelRatio;
+      const count = Math.max(18, Math.floor((r.width * r.height) / 26000));
+      pts = Array.from({ length: count }, () => ({
+        x: Math.random() * w, y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.12 * devicePixelRatio,
+        vy: (Math.random() - 0.5) * 0.12 * devicePixelRatio,
+      }));
+    }
+    function frame() {
+      ctx.clearRect(0, 0, w, h);
+      const maxD = 150 * devicePixelRatio;
+      for (const p of pts) { p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1; }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) {
+          const a = pts[i], b = pts[j];
+          const d = Math.hypot(a.x - b.x, a.y - b.y);
+          if (d < maxD) {
+            ctx.strokeStyle = `rgba(27,58,92,${(1 - d / maxD) * 0.28})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          }
+        }
+      }
+      for (const p of pts) {
+        ctx.fillStyle = 'rgba(255,77,28,0.55)';
+        ctx.beginPath(); ctx.arc(p.x, p.y, 1.6 * devicePixelRatio, 0, Math.PI * 2); ctx.fill();
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    resize(); window.addEventListener('resize', resize);
+    if (reduce) { frame(); cancelAnimationFrame(raf); } else frame();
+  })();
+</script>
+
+<!-- ============ THREE.JS 3D MODEL ============ -->
+<script type="module">
+  import * as THREE from 'three';
+
+  const canvas = document.getElementById('model-canvas');
+  const statusEl = document.getElementById('model-status');
+  if (canvas) {
+    const scene = new THREE.Scene();
+    const wrap = canvas.parentElement;
+
+    const camera = new THREE.PerspectiveCamera(38, 16 / 11, 0.1, 200);
+    camera.position.set(26, 15, 30);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+    function size() {
+      const r = wrap.getBoundingClientRect();
+      renderer.setSize(r.width, r.height, false);
+      camera.aspect = r.width / r.height;
+      camera.updateProjectionMatrix();
+    }
+
+    // ---- Procedural through-truss bridge geometry ----
+    const group = new THREE.Group();
+    scene.add(group);
+
+    const bays = 8, bayLen = 4, height = 5, halfW = 3;
+    const nodes = [];       // {pos, key}
+    const nodeIndex = {};
+    function node(x, y, z) {
+      const key = `${x},${y},${z}`;
+      if (nodeIndex[key] === undefined) { nodeIndex[key] = nodes.length; nodes.push(new THREE.Vector3(x, y, z)); }
+      return nodeIndex[key];
+    }
+    const members = []; // [i,j]
+    function member(a, b) { members.push([a, b]); }
+
+    const x0 = -(bays * bayLen) / 2;
+    for (let s = 0; s <= bays; s++) {
+      const x = x0 + s * bayLen;
+      // bottom chord nodes (both sides)
+      node(x, 0, -halfW); node(x, 0, halfW);
+      // top chord nodes only between end portals
+      if (s > 0 && s < bays) { node(x, height, -halfW); node(x, height, halfW); }
+    }
+    const B = (s, side) => nodeIndex[`${x0 + s * bayLen},0,${side * halfW}`];
+    const T = (s, side) => nodeIndex[`${x0 + s * bayLen},${height},${side * halfW}`];
+
+    for (let s = 0; s < bays; s++) {
+      for (const side of [-1, 1]) {
+        member(B(s, side), B(s + 1, side));                 // bottom chord
+        if (s > 0 && s < bays - 1) member(T(s, side), T(s + 1, side)); // top chord
+        // verticals
+        if (s > 0) member(B(s, side), T(s, side));
+        // diagonals (web)
+        if (s > 0 && s < bays) member(B(s, side), (s < bays - 1 ? T(s + 1, side) : undefined) ?? B(s + 1, side));
+        if (s > 0) member(T(s, side) ?? B(s, side), B(s + 1, side));
+      }
+      // floor beams (bottom laterals)
+      member(B(s, -1), B(s, 1));
+      // top laterals
+      if (s > 0 && s < bays - 1) member(T(s, -1), T(s, 1));
+    }
+    member(B(bays, -1), B(bays, 1));
+    // end portals (incline top chord to bottom at the ends)
+    for (const side of [-1, 1]) {
+      member(B(0, side), T(1, side));
+      member(B(bays, side), T(bays - 1, side));
+    }
+    // portal top bracing
+    member(T(1, -1), T(1, 1));
+    member(T(bays - 1, -1), T(bays - 1, 1));
+
+    // deck plane
+    const deckGeo = new THREE.PlaneGeometry(bays * bayLen, halfW * 2);
+    const deckMat = new THREE.MeshBasicMaterial({ color: 0x1B3A5C, transparent: true, opacity: 0.18, side: THREE.DoubleSide });
+    const deck = new THREE.Mesh(deckGeo, deckMat);
+    deck.rotation.x = -Math.PI / 2;
+    deck.position.y = 0.02;
+    group.add(deck);
+
+    // members as line segments
+    const linePos = [];
+    for (const [a, b] of members) {
+      if (a === undefined || b === undefined) continue;
+      linePos.push(nodes[a].x, nodes[a].y, nodes[a].z, nodes[b].x, nodes[b].y, nodes[b].z);
+    }
+    const lineGeo = new THREE.BufferGeometry();
+    lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePos, 3));
+    const lineMat = new THREE.LineBasicMaterial({ color: 0xE7E8E1 });
+    const lines = new THREE.LineSegments(lineGeo, lineMat);
+    group.add(lines);
+
+    // secondary blueprint-tinted overlay lines for depth
+    const lineMat2 = new THREE.LineBasicMaterial({ color: 0x6f86a3, transparent: true, opacity: 0.5 });
+    const lines2 = new THREE.LineSegments(lineGeo.clone(), lineMat2);
+    lines2.scale.setScalar(1.001);
+    group.add(lines2);
+
+    // nodes as instanced spheres
+    const sphereGeo = new THREE.SphereGeometry(0.22, 10, 10);
+    const sphereMat = new THREE.MeshBasicMaterial({ color: 0xFF4D1C });
+    const inst = new THREE.InstancedMesh(sphereGeo, sphereMat, nodes.length);
+    const dummy = new THREE.Object3D();
+    nodes.forEach((n, i) => { dummy.position.copy(n); dummy.updateMatrix(); inst.setMatrixAt(i, dummy.matrix); });
+    inst.instanceMatrix.needsUpdate = true;
+    group.add(inst);
+
+    // load-view arrows (hidden by default)
+    const loadGroup = new THREE.Group();
+    loadGroup.visible = false;
+    for (let s = 1; s < bays; s++) {
+      for (const side of [-1, 1]) {
+        const x = x0 + s * bayLen;
+        const dir = new THREE.Vector3(0, -1, 0);
+        const origin = new THREE.Vector3(x, height + 2.2, side * halfW);
+        const arrow = new THREE.ArrowHelper(dir, origin, 2.0, 0xFF4D1C, 0.7, 0.45);
+        loadGroup.add(arrow);
+      }
+    }
+    group.add(loadGroup);
+
+    group.position.y = -1.5;
+
+    // ---- interaction: auto-rotate + drag orbit ----
+    let autoRotate = true;
+    let theta = 0.7, phi = 0.62, radius = 42;
+    let dragging = false, lastX = 0, lastY = 0;
+
+    function applyCamera() {
+      camera.position.x = radius * Math.sin(phi) * Math.cos(theta);
+      camera.position.y = radius * Math.cos(phi);
+      camera.position.z = radius * Math.sin(phi) * Math.sin(theta);
+      camera.lookAt(0, 0, 0);
+    }
+
+    canvas.addEventListener('pointerdown', (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; canvas.setPointerCapture(e.pointerId); });
+    canvas.addEventListener('pointerup', (e) => { dragging = false; });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      theta -= (e.clientX - lastX) * 0.006;
+      phi = Math.min(Math.max(phi - (e.clientY - lastY) * 0.006, 0.25), 1.35);
+      lastX = e.clientX; lastY = e.clientY;
+    });
+    canvas.addEventListener('wheel', (e) => { e.preventDefault(); radius = Math.min(Math.max(radius + e.deltaY * 0.03, 26), 70); }, { passive: false });
+
+    const btnRotate = document.getElementById('model-rotate');
+    const btnWire = document.getElementById('model-wire');
+    if (btnRotate) btnRotate.addEventListener('click', () => {
+      autoRotate = !autoRotate;
+      btnRotate.textContent = autoRotate ? 'Pause Rotation' : 'Resume Rotation';
+    });
+    if (btnWire) btnWire.addEventListener('click', () => {
+      loadGroup.visible = !loadGroup.visible;
+      btnWire.textContent = loadGroup.visible ? 'Hide Load View' : 'Toggle Load View';
+      if (statusEl) statusEl.textContent = loadGroup.visible ? 'MODEL EXA—0142 · LOAD CASE LC-2' : 'MODEL EXA—0142 · LIVE RENDER';
+    });
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function animate() {
+      if (autoRotate && !dragging && !reduce) theta += 0.0022;
+      applyCamera();
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+    size();
+    window.addEventListener('resize', size);
+    applyCamera();
+    animate();
+    if (statusEl) statusEl.textContent = 'MODEL EXA—0142 · LIVE RENDER';
+
+  }
+
+  // ---- subtle rotating wireframe icosahedron behind the model section ----
+  const bg = document.getElementById('model-bg');
+  if (bg) {
+    const scene2 = new THREE.Scene();
+    const cam2 = new THREE.PerspectiveCamera(45, 2, 0.1, 100);
+    cam2.position.z = 30;
+    const rend2 = new THREE.WebGLRenderer({ canvas: bg, antialias: true, alpha: true });
+    rend2.setPixelRatio(Math.min(devicePixelRatio, 2));
+    function size2() { const r = bg.getBoundingClientRect(); rend2.setSize(r.width, r.height, false); cam2.aspect = r.width / r.height; cam2.updateProjectionMatrix(); }
+    const geo = new THREE.IcosahedronGeometry(14, 1);
+    const wire = new THREE.WireframeGeometry(geo);
+    const mat = new THREE.LineBasicMaterial({ color: 0x2b4a68, transparent: true, opacity: 0.35 });
+    const mesh = new THREE.LineSegments(wire, mat);
+    mesh.position.set(9, 0, -6);
+    scene2.add(mesh);
+    const reduce2 = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function loop2() { if (!reduce2) { mesh.rotation.y += 0.0015; mesh.rotation.x += 0.0008; } rend2.render(scene2, cam2); requestAnimationFrame(loop2); }
+    size2(); window.addEventListener('resize', size2); loop2();
+  }
+</script>
+
+</body>
+</html>

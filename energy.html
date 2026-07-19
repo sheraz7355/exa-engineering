@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EXA Energy | Solar Installation &amp; PV Infrastructure</title>
+<meta content="Utility-scale solar arrays, commercial rooftop PV, and storage integration — engineered to the panel." name="description"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          paper: '#F2F3EE',
+          'paper-dim': '#E7E8E1',
+          ink: '#15181B',
+          'ink-soft': '#565C60',
+          blueprint: '#1B3A5C',
+          'blueprint-dim': '#274A6E',
+          signal: '#FF4D1C',
+          line: 'rgba(21,24,27,0.14)',
+        },
+        fontFamily: {
+          display: ['"Space Grotesk"', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['"IBM Plex Mono"', 'monospace'],
+        },
+      },
+    },
+  }
+</script>
+<style>
+  html { background: #F2F3EE; }
+  body { font-feature-settings: "tnum" 1; }
+
+  .grid-field {
+    background-image:
+      linear-gradient(to right, rgba(21,24,27,0.055) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(21,24,27,0.055) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .grid-field-dark {
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .sheet { position: relative; box-shadow: 0 1px 0 rgba(21,24,27,0.06), 0 24px 48px -32px rgba(21,24,27,0.25); }
+  .sheet::before, .sheet::after,
+  .sheet .bl::before, .sheet .br::before { content: ""; position: absolute; width: 14px; height: 14px; z-index: 10; }
+  .sheet::before { top: -1px; left: -1px; border-top: 2px solid var(--bracket, #15181B); border-left: 2px solid var(--bracket, #15181B); }
+  .sheet::after { top: -1px; right: -1px; border-top: 2px solid var(--bracket, #15181B); border-right: 2px solid var(--bracket, #15181B); }
+  .sheet .bl::before { bottom: -1px; left: -1px; border-bottom: 2px solid var(--bracket, #15181B); border-left: 2px solid var(--bracket, #15181B); }
+  .sheet .br::before { bottom: -1px; right: -1px; border-bottom: 2px solid var(--bracket, #15181B); border-right: 2px solid var(--bracket, #15181B); }
+  .sheet-light::before, .sheet-light::after,
+  .sheet-light .bl::before, .sheet-light .br::before { --bracket: rgba(255,255,255,0.5); }
+
+  .leader-line { stroke: rgba(21,24,27,0.4); stroke-width: 1; }
+
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .draw-path { stroke-dasharray: 2000; stroke-dashoffset: 2000; animation: draw 2.4s ease-out forwards; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-in { animation: fadeUp 0.8s cubic-bezier(0.22,1,0.36,1) both; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .floaty { animation: floaty 7s ease-in-out infinite; }
+
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+  .reveal .stagger > * { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.is-visible .stagger > * { opacity: 1; transform: translateY(0); }
+  .stagger > *:nth-child(2) { transition-delay: 0.08s; }
+  .stagger > *:nth-child(3) { transition-delay: 0.16s; }
+  .stagger > *:nth-child(4) { transition-delay: 0.24s; }
+  .stagger > *:nth-child(5) { transition-delay: 0.32s; }
+  .stagger > *:nth-child(6) { transition-delay: 0.40s; }
+
+  ::selection { background: #FF4D1C; color: white; }
+
+  #engineered-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    opacity: 0; transition: opacity 1.2s ease;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cpath d='M80 72v16M72 80h16' stroke='%231B3A5C' stroke-opacity='0.16' stroke-width='1'/%3E%3C/svg%3E"),
+      linear-gradient(to right, rgba(27,58,92,0.055) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(27,58,92,0.055) 1px, transparent 1px),
+      linear-gradient(to right, rgba(27,58,92,0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(27,58,92,0.03) 1px, transparent 1px);
+    background-size: 160px 160px, 160px 160px, 160px 160px, 32px 32px, 32px 32px;
+    mask-image: radial-gradient(ellipse at center, black 55%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 55%, transparent 100%);
+  }
+  #engineered-bg.show { opacity: 1; }
+  main > section, footer { position: relative; z-index: 1; }
+
+  .ph {
+    background: repeating-linear-gradient(-45deg, rgba(27,58,92,0.06) 0 10px, transparent 10px 20px), #E7E8E1;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+  details[open] .accordion-icon { transform: rotate(45deg); }
+
+  #mobile-menu { transform: translateX(100%); transition: transform 0.35s ease; }
+  #mobile-menu.open { transform: translateX(0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .draw-path { animation: none; stroke-dashoffset: 0; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .hero-in, .floaty { animation: none; }
+    .reveal .stagger > * { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body class="bg-paper text-ink font-body antialiased">
+<div id="engineered-bg"></div>
+
+<!-- ============ HEADER ============ -->
+<header class="fixed top-0 w-full z-50 bg-paper/90 backdrop-blur-md border-b border-line">
+  <div class="max-w-[1440px] mx-auto flex items-center justify-between h-[76px] px-6 md:px-10">
+    <a href="exa-engineering-redesign (1).html" class="flex items-center gap-3">
+      <svg width="34" height="34" viewBox="0 0 36 36" fill="none">
+        <path d="M4.5 12.5 C2.5 6.5 4.5 3 8.5 1.5 C9.5 6.5 8.5 10.5 4.5 12.5 Z" stroke="#15181B" stroke-width="1.4" stroke-linejoin="round"/>
+        <circle cx="26" cy="8.5" r="4" stroke="#FF4D1C" stroke-width="1.4"/>
+        <g stroke="#FF4D1C" stroke-width="1.4" stroke-linecap="round">
+          <line x1="26" y1="1.2" x2="26" y2="2.8"/>
+          <line x1="33.3" y1="8.5" x2="31.7" y2="8.5"/>
+          <line x1="31.2" y1="3.3" x2="30" y2="4.5"/>
+          <line x1="31.2" y1="13.7" x2="30" y2="12.5"/>
+        </g>
+        <path d="M12 16 H27 L32 31 H5 Z" stroke="#1B3A5C" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M17 16 L14 31 M22 16 L23 31 M9.7 21 H28.7 M7.3 26 H30.3" stroke="#1B3A5C" stroke-width="1"/>
+      </svg>
+      <span class="font-display font-semibold tracking-tight text-lg">EXA <span class="font-medium text-ink-soft">ENERGY</span></span>
+    </a>
+    <nav class="hidden lg:flex items-center gap-7">
+      <a href="exa-engineering-redesign (1).html" class="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft hover:text-blueprint transition-colors">← Main Site</a>
+      <a href="#solutions" class="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft hover:text-blueprint transition-colors">Solutions</a>
+      <a href="#installations" class="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft hover:text-blueprint transition-colors">Installations</a>
+      <a href="#process" class="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft hover:text-blueprint transition-colors">Process</a>
+      <a href="#specs" class="font-mono text-[12px] uppercase tracking-[0.12em] text-ink-soft hover:text-blueprint transition-colors">Specs</a>
+      <a href="#contact" class="bg-ink text-paper px-5 py-2.5 font-mono text-[12px] uppercase tracking-[0.12em] hover:bg-signal transition-colors">
+        Request Site Assessment
+      </a>
+    </nav>
+    <button id="menu-btn" class="lg:hidden text-ink" aria-label="Menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.8"/></svg>
+    </button>
+  </div>
+</header>
+
+<div id="mobile-menu" class="fixed top-0 right-0 h-full w-[78%] max-w-xs bg-ink text-white z-[60] p-8 flex flex-col gap-6 lg:hidden">
+  <button id="menu-close" class="self-end text-white/70" aria-label="Close menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8"/></svg>
+  </button>
+  <a href="exa-engineering-redesign (1).html" class="font-mono text-sm uppercase tracking-[0.12em] text-white/80">← Main Site</a>
+  <a href="#solutions" class="font-mono text-sm uppercase tracking-[0.12em] text-white/80">Solutions</a>
+  <a href="#installations" class="font-mono text-sm uppercase tracking-[0.12em] text-white/80">Installations</a>
+  <a href="#process" class="font-mono text-sm uppercase tracking-[0.12em] text-white/80">Process</a>
+  <a href="#specs" class="font-mono text-sm uppercase tracking-[0.12em] text-white/80">Specs</a>
+  <a href="#contact" class="bg-signal text-white text-center px-5 py-3 font-mono text-[12px] uppercase tracking-[0.12em] mt-2">Request Site Assessment</a>
+</div>
+<div id="menu-backdrop" class="fixed inset-0 bg-black/40 z-[55] hidden lg:hidden"></div>
+
+<main class="pt-[76px]">
+
+  <!-- ============ HERO ============ -->
+  <section class="relative grid-field border-b border-line overflow-hidden">
+    <div class="relative z-10 max-w-[1440px] mx-auto px-6 md:px-10 py-16 md:py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="hero-in font-mono text-[12px] uppercase tracking-[0.2em] text-signal mb-5 flex items-center gap-2">
+          <span class="w-6 h-px bg-signal inline-block"></span>
+          Solar — Photovoltaic — Storage
+        </div>
+        <h1 style="animation-delay:0.1s" class="hero-in font-display font-semibold text-[42px] leading-[1.05] md:text-[64px] md:leading-[1.02] tracking-tight mb-6">
+          Solar arrays, engineered to the panel.
+        </h1>
+        <p style="animation-delay:0.2s" class="hero-in text-ink-soft text-[17px] md:text-lg leading-relaxed max-w-lg mb-9">
+          From 50 MW utility fields to commercial rooftop fleets, EXA designs, validates, and oversees photovoltaic installations with the same structural rigor we bring to bridges — every rack, pile, and inverter pad calculated before ground is broken.
+        </p>
+        <div style="animation-delay:0.3s" class="hero-in flex flex-wrap gap-4 mb-12">
+          <a href="#contact" class="bg-signal text-white px-7 py-4 font-mono text-[12px] uppercase tracking-[0.14em] hover:bg-ink transition-colors">
+            Request Site Assessment
+          </a>
+          <a href="#installations" class="border border-ink text-ink px-7 py-4 font-mono text-[12px] uppercase tracking-[0.14em] hover:bg-ink hover:text-paper transition-colors">
+            View Installations
+          </a>
+        </div>
+        <div style="animation-delay:0.4s" class="hero-in grid grid-cols-3 border-t border-line pt-6 max-w-lg">
+          <div>
+            <div class="font-display font-semibold text-2xl md:text-3xl"><span class="count" data-to="3800">0</span></div>
+            <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-soft mt-1">MW Installed</div>
+          </div>
+          <div class="border-l border-line pl-5">
+            <div class="font-display font-semibold text-2xl md:text-3xl"><span class="count" data-to="86">0</span></div>
+            <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-soft mt-1">Arrays Delivered</div>
+          </div>
+          <div class="border-l border-line pl-5">
+            <div class="font-display font-semibold text-2xl md:text-3xl">99.2%</div>
+            <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-soft mt-1">Fleet Uptime</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Solar array technical drawing -->
+      <div style="animation-delay:0.25s" class="hero-in floaty relative sheet bg-white/60 border border-line p-6">
+        <div class="bl"></div><div class="br"></div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="font-mono text-[10px] uppercase tracking-[0.15em] text-ink-soft">DWG NO. EXA—PV—0310</span>
+          <span class="font-mono text-[10px] uppercase tracking-[0.15em] text-ink-soft">SCALE N.T.S.</span>
+        </div>
+        <svg viewBox="0 0 560 420" class="w-full h-auto">
+          <!-- sun path arc -->
+          <path d="M60 120 A 240 240 0 0 1 500 120" fill="none" stroke="rgba(27,58,92,0.35)" stroke-width="1" stroke-dasharray="4 5"/>
+          <circle cx="280" cy="52" r="12" fill="none" stroke="#FF4D1C" stroke-width="1.6" class="draw-path"/>
+          <g stroke="#FF4D1C" stroke-width="1.2">
+            <line x1="280" y1="30" x2="280" y2="22"/><line x1="280" y1="82" x2="280" y2="74"/>
+            <line x1="258" y1="52" x2="250" y2="52"/><line x1="310" y1="52" x2="302" y2="52"/>
+            <line x1="264" y1="36" x2="258" y2="30"/><line x1="296" y1="36" x2="302" y2="30"/>
+            <line x1="264" y1="68" x2="258" y2="74"/><line x1="296" y1="68" x2="302" y2="74"/>
+          </g>
+          <!-- ground line -->
+          <line x1="30" y1="330" x2="530" y2="330" stroke="#15181B" stroke-width="2.5" class="draw-path"/>
+          <!-- tilted panel rows (side profile) -->
+          <g class="draw-path" stroke="#1B3A5C" stroke-width="2" fill="none">
+            <line x1="70" y1="318" x2="170" y2="250"/>
+            <line x1="230" y1="318" x2="330" y2="250"/>
+            <line x1="390" y1="318" x2="490" y2="250"/>
+          </g>
+          <!-- panel cell hatching -->
+          <g stroke="#1B3A5C" stroke-width="1" opacity="0.55">
+            <line x1="95" y1="301" x2="103" y2="313"/><line x1="120" y1="284" x2="128" y2="296"/><line x1="145" y1="267" x2="153" y2="279"/>
+            <line x1="255" y1="301" x2="263" y2="313"/><line x1="280" y1="284" x2="288" y2="296"/><line x1="305" y1="267" x2="313" y2="279"/>
+            <line x1="415" y1="301" x2="423" y2="313"/><line x1="440" y1="284" x2="448" y2="296"/><line x1="465" y1="267" x2="473" y2="279"/>
+          </g>
+          <!-- support piles -->
+          <g stroke="#15181B" stroke-width="2">
+            <line x1="120" y1="284" x2="120" y2="330"/>
+            <line x1="280" y1="284" x2="280" y2="330"/>
+            <line x1="440" y1="284" x2="440" y2="330"/>
+          </g>
+          <!-- pile foundations -->
+          <g fill="#FF4D1C">
+            <circle cx="120" cy="330" r="3.5"/><circle cx="280" cy="330" r="3.5"/><circle cx="440" cy="330" r="3.5"/>
+          </g>
+          <!-- tilt angle -->
+          <path d="M110 318 A 40 40 0 0 0 100 297" fill="none" stroke="#FF4D1C" stroke-width="1.2"/>
+          <text x="128" y="305" font-family="IBM Plex Mono" font-size="11" fill="#FF4D1C">34°</text>
+          <!-- row pitch dimension -->
+          <line x1="70" y1="360" x2="230" y2="360" stroke="rgba(21,24,27,0.4)" stroke-width="1"/>
+          <line x1="70" y1="354" x2="70" y2="366" stroke="rgba(21,24,27,0.4)" stroke-width="1"/>
+          <line x1="230" y1="354" x2="230" y2="366" stroke="rgba(21,24,27,0.4)" stroke-width="1"/>
+          <text x="150" y="378" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#565C60">ROW PITCH 8.4 M</text>
+          <!-- leader labels -->
+          <line x1="330" y1="250" x2="380" y2="215" class="leader-line"/>
+          <text x="384" y="218" font-family="IBM Plex Mono" font-size="10" fill="#565C60">BIFACIAL MODULE, 620 W</text>
+          <line x1="280" y1="310" x2="230" y2="220" class="leader-line"/>
+          <text x="152" y="214" font-family="IBM Plex Mono" font-size="10" fill="#565C60">DRIVEN STEEL PILE, 2.4 M</text>
+          <!-- irradiance arrows -->
+          <g stroke="#FF4D1C" stroke-width="1.2" fill="none">
+            <path d="M210 120 L160 210" marker-end="url(#arrowE)"/>
+            <path d="M350 120 L300 210" marker-end="url(#arrowE)"/>
+          </g>
+          <text x="290" y="110" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#FF4D1C">1,120 kWh/m²·yr</text>
+          <defs>
+            <marker id="arrowE" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#FF4D1C"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DATA STRIP ============ -->
+  <section class="bg-ink grid-field-dark border-b border-black/40">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10 py-4 flex flex-wrap gap-x-10 gap-y-2 justify-between font-mono text-[11px] uppercase tracking-[0.12em] text-white/70">
+      <span>IEC 61215 / 61730 COMPLIANT</span>
+      <span>3.8 GW CUMULATIVE CAPACITY</span>
+      <span>P50/P90 YIELD MODELLING</span>
+      <span>MONITORING DESK: 24/7/365</span>
+    </div>
+  </section>
+
+  <!-- ============ SOLUTIONS ============ -->
+  <section class="py-20 md:py-28 border-b border-line" id="solutions">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-14 gap-4">
+        <div>
+          <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">Solar Solutions</span>
+          <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2">Three installation classes.</h2>
+        </div>
+        <p class="text-ink-soft max-w-sm">Every array is yield-modelled, wind-load tested, and grid-study cleared before the first pile is driven.</p>
+      </div>
+
+      <div class="stagger grid grid-cols-1 md:grid-cols-3 gap-px bg-line border border-line">
+        <div class="bg-paper p-8 hover:bg-white transition-colors group">
+          <div class="flex items-center justify-between mb-8">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#15181B" stroke-width="1.5"><rect x="3" y="8" width="18" height="10" transform="skewX(-8)"/><path d="M3 13h18M9 8v10M15 8v10M8 21h8"/></svg>
+            <span class="font-mono text-[10px] text-ink-soft group-hover:text-signal transition-colors">PV / UTL</span>
+          </div>
+          <h3 class="font-display font-semibold text-xl mb-3">Utility-Scale Fields</h3>
+          <p class="text-ink-soft text-[15px] leading-relaxed mb-6">
+            50–800 MW single-axis tracker fields on driven-pile foundations, with full geotechnical survey and P50/P90 energy modelling.
+          </p>
+          <span class="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">Typ. delivery 20–36 weeks</span>
+        </div>
+        <div class="bg-paper p-8 hover:bg-white transition-colors group">
+          <div class="flex items-center justify-between mb-8">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#15181B" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M8 10h8v5H8z"/></svg>
+            <span class="font-mono text-[10px] text-ink-soft group-hover:text-signal transition-colors">PV / COM</span>
+          </div>
+          <h3 class="font-display font-semibold text-xl mb-3">Commercial Rooftop</h3>
+          <p class="text-ink-soft text-[15px] leading-relaxed mb-6">
+            Ballasted and mechanically attached rooftop systems, engineered against the host structure's residual load capacity — never past it.
+          </p>
+          <span class="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">Typ. delivery 8–14 weeks</span>
+        </div>
+        <div class="bg-paper p-8 hover:bg-white transition-colors group">
+          <div class="flex items-center justify-between mb-8">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#15181B" stroke-width="1.5"><rect x="5" y="4" width="14" height="16"/><path d="M9 8h6M9 12h6M9 16h6"/></svg>
+            <span class="font-mono text-[10px] text-ink-soft group-hover:text-signal transition-colors">PV / BESS</span>
+          </div>
+          <h3 class="font-display font-semibold text-xl mb-3">Storage Integration</h3>
+          <p class="text-ink-soft text-[15px] leading-relaxed mb-6">
+            Battery energy storage co-located with PV — pad design, thermal management, and interconnection studies as one package.
+          </p>
+          <span class="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft">Typ. delivery 12–20 weeks</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURED INSTALLATION ============ -->
+  <section class="py-20 md:py-28 bg-ink text-white border-b border-black/40 grid-field-dark">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">Featured Installation</span>
+      <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2 mb-12 max-w-2xl">Sonora Mesa Solar Field</h2>
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-10 items-start">
+        <div class="lg:col-span-3 sheet sheet-light">
+          <div class="bl"></div><div class="br"></div>
+          <div class="ph aspect-[16/10] border border-white/15">
+            <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-soft text-center px-6">[ aerial photo — 420 MW tracker field at golden hour ]</span>
+          </div>
+          <div class="flex justify-between font-mono text-[10px] uppercase tracking-[0.1em] text-white/45 mt-3 px-1">
+            <span>FIG. 01 — SONORA MESA, PHASE II</span>
+            <span>REV. B</span>
+          </div>
+        </div>
+        <div class="lg:col-span-2">
+          <p class="text-white/70 leading-relaxed mb-8">
+            A 420 MW single-axis tracker installation across 1,900 acres of high-desert terrain. EXA delivered geotech, racking structural design, and construction oversight — 96,000 piles driven with a refusal rate under 0.4%, and first energy eight weeks ahead of the interconnection deadline.
+          </p>
+          <div class="grid grid-cols-2 gap-6 mb-8">
+            <div class="border-t border-white/15 pt-4"><div class="font-display font-semibold text-2xl">420 MW</div><div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/50 mt-1">Nameplate Capacity</div></div>
+            <div class="border-t border-white/15 pt-4"><div class="font-display font-semibold text-2xl">680k</div><div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/50 mt-1">Bifacial Modules</div></div>
+            <div class="border-t border-white/15 pt-4"><div class="font-display font-semibold text-2xl">96,000</div><div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/50 mt-1">Driven Piles</div></div>
+            <div class="border-t border-white/15 pt-4"><div class="font-display font-semibold text-2xl">31.4%</div><div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/50 mt-1">Capacity Factor</div></div>
+          </div>
+          <blockquote class="border-l-2 border-signal pl-5 text-white/80 italic">
+            "EXA's pile refusal analysis saved us an entire re-mobilization. First energy came early, and under budget."
+            <footer class="not-italic font-mono text-[11px] uppercase tracking-[0.1em] text-white/50 mt-3">— T. Nakamura, VP Development, Volta Energy</footer>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ METRICS BAND ============ -->
+  <section class="py-20 md:py-24 bg-blueprint grid-field-dark border-b border-black/30">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <div class="stagger grid grid-cols-2 md:grid-cols-4 gap-px bg-white/10 border border-white/10">
+        <div class="bg-blueprint p-8">
+          <div class="font-display font-semibold text-white text-4xl md:text-5xl"><span class="count" data-to="3800">0</span></div>
+          <div class="font-mono text-[10px] uppercase tracking-[0.12em] text-white/55 mt-2">MW Installed to Date</div>
+        </div>
+        <div class="bg-blueprint p-8">
+          <div class="font-display font-semibold text-white text-4xl md:text-5xl"><span class="count" data-to="86">0</span></div>
+          <div class="font-mono text-[10px] uppercase tracking-[0.12em] text-white/55 mt-2">Arrays Commissioned</div>
+        </div>
+        <div class="bg-blueprint p-8">
+          <div class="font-display font-semibold text-white text-4xl md:text-5xl"><span class="count" data-to="12">0</span>M</div>
+          <div class="font-mono text-[10px] uppercase tracking-[0.12em] text-white/55 mt-2">Tonnes CO₂ Displaced / Decade</div>
+        </div>
+        <div class="bg-blueprint p-8">
+          <div class="font-display font-semibold text-white text-4xl md:text-5xl"><span class="count" data-to="0">0</span></div>
+          <div class="font-mono text-[10px] uppercase tracking-[0.12em] text-white/55 mt-2">Racking Failures On Record</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROCESS ============ -->
+  <section class="py-20 md:py-28 bg-paper-dim border-b border-line" id="process">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <div class="mb-16">
+        <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">How We Deliver</span>
+        <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2">From irradiance data to first energy.</h2>
+        <p class="text-ink-soft max-w-xl mt-4">Each stage closes with a written sign-off before the next begins — the same discipline as our structural practice.</p>
+      </div>
+      <div class="stagger relative grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-6">
+        <div class="hidden md:block absolute top-0 left-0 right-0 h-px bg-line"></div>
+        <div class="relative pt-8">
+          <div class="hidden md:flex w-3 h-3 rounded-full bg-signal absolute -top-[6px] left-0 ring-4 ring-paper-dim"></div>
+          <div class="font-mono text-signal text-sm mb-4">STAGE 01</div>
+          <h3 class="font-display font-semibold text-lg mb-2">Resource &amp; Site Study</h3>
+          <p class="text-ink-soft text-sm leading-relaxed">Irradiance modelling, geotechnical borings, shading analysis, and interconnection screening.</p>
+        </div>
+        <div class="relative pt-8">
+          <div class="hidden md:flex w-3 h-3 rounded-full bg-signal absolute -top-[6px] left-0 ring-4 ring-paper-dim"></div>
+          <div class="font-mono text-signal text-sm mb-4">STAGE 02</div>
+          <h3 class="font-display font-semibold text-lg mb-2">Array &amp; Racking Design</h3>
+          <p class="text-ink-soft text-sm leading-relaxed">Tracker layout, pile embedment design, string sizing, and P50/P90 yield certification.</p>
+        </div>
+        <div class="relative pt-8">
+          <div class="hidden md:flex w-3 h-3 rounded-full bg-signal absolute -top-[6px] left-0 ring-4 ring-paper-dim"></div>
+          <div class="font-mono text-signal text-sm mb-4">STAGE 03</div>
+          <h3 class="font-display font-semibold text-lg mb-2">Construction Oversight</h3>
+          <p class="text-ink-soft text-sm leading-relaxed">Pile-driving QA, torque verification, and IV-curve commissioning tests on every string.</p>
+        </div>
+        <div class="relative pt-8">
+          <div class="hidden md:flex w-3 h-3 rounded-full bg-signal absolute -top-[6px] left-0 ring-4 ring-paper-dim"></div>
+          <div class="font-mono text-signal text-sm mb-4">STAGE 04</div>
+          <h3 class="font-display font-semibold text-lg mb-2">Monitoring &amp; O&amp;M</h3>
+          <p class="text-ink-soft text-sm leading-relaxed">24/7 performance monitoring against the yield model, with annual thermographic inspection.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INSTALLATIONS ============ -->
+  <section class="py-20 md:py-28 border-b border-line" id="installations">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <div class="flex justify-between items-end mb-12">
+        <div>
+          <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">Installations</span>
+          <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2">Recent solar work.</h2>
+        </div>
+      </div>
+      <div class="stagger grid grid-cols-1 md:grid-cols-2 gap-px bg-line border border-line">
+        <div class="relative group overflow-hidden bg-paper-dim">
+          <div class="ph aspect-video transition-transform duration-700 group-hover:scale-[1.02]">
+            <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-soft text-center px-6">[ photo — desert tracker rows, drone view ]</span>
+          </div>
+          <div class="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.1em] text-ink bg-paper/90 px-2 py-1 border border-line">UTILITY · 420 MW</div>
+          <div class="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-paper to-transparent"><h4 class="font-display font-semibold text-lg">Sonora Mesa Solar Field</h4></div>
+        </div>
+        <div class="relative group overflow-hidden bg-paper-dim">
+          <div class="ph aspect-video transition-transform duration-700 group-hover:scale-[1.02]">
+            <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-soft text-center px-6">[ photo — warehouse rooftop array ]</span>
+          </div>
+          <div class="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.1em] text-ink bg-paper/90 px-2 py-1 border border-line">ROOFTOP · 18 MW</div>
+          <div class="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-paper to-transparent"><h4 class="font-display font-semibold text-lg">Portline Logistics Fleet, 14 Roofs</h4></div>
+        </div>
+        <div class="relative group overflow-hidden bg-paper-dim">
+          <div class="ph aspect-video transition-transform duration-700 group-hover:scale-[1.02]">
+            <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-soft text-center px-6">[ photo — battery container yard beside PV field ]</span>
+          </div>
+          <div class="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.1em] text-ink bg-paper/90 px-2 py-1 border border-line">PV + BESS · 120 MW / 480 MWh</div>
+          <div class="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-paper to-transparent"><h4 class="font-display font-semibold text-lg">Cascada Valley Hybrid Plant</h4></div>
+        </div>
+        <div class="relative group overflow-hidden bg-paper-dim">
+          <div class="ph aspect-video transition-transform duration-700 group-hover:scale-[1.02]">
+            <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-soft text-center px-6">[ photo — floating PV on reservoir ]</span>
+          </div>
+          <div class="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.1em] text-ink bg-paper/90 px-2 py-1 border border-line">FLOATING · 45 MW</div>
+          <div class="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-paper to-transparent"><h4 class="font-display font-semibold text-lg">Meridian Reservoir Float Array</h4></div>
+        </div>
+      </div>
+      <p class="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-soft mt-4">Drop project photography into the bracketed slots — layout is ready.</p>
+    </div>
+  </section>
+
+  <!-- ============ SPECS TABLE ============ -->
+  <section class="py-20 md:py-28 bg-paper-dim border-b border-line" id="specs">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10">
+      <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">Technical Specifications</span>
+      <h2 class="font-display font-semibold text-3xl md:text-[44px] tracking-tight mt-2 mb-12">What we engineer against.</h2>
+      <div class="border border-line overflow-x-auto bg-paper">
+        <table class="w-full text-left border-collapse min-w-[640px]">
+          <thead>
+            <tr class="bg-ink text-white font-mono text-[11px] uppercase tracking-[0.1em]">
+              <th class="p-4 font-medium">Parameter</th>
+              <th class="p-4 font-medium">Utility-Scale</th>
+              <th class="p-4 font-medium">Rooftop</th>
+              <th class="p-4 font-medium">Standard</th>
+            </tr>
+          </thead>
+          <tbody class="font-mono text-[13px]">
+            <tr class="border-t border-line">
+              <td class="p-4 font-semibold">Wind Load Design</td>
+              <td class="p-4 text-ink-soft">Up to 240 km/h, 3-sec gust</td>
+              <td class="p-4 text-ink-soft">Site-specific uplift study</td>
+              <td class="p-4 text-ink-soft">ASCE 7-22</td>
+            </tr>
+            <tr class="border-t border-line bg-paper-dim/60">
+              <td class="p-4 font-semibold">Module Certification</td>
+              <td class="p-4 text-ink-soft">Bifacial 580–650 W</td>
+              <td class="p-4 text-ink-soft">Mono PERC 420–460 W</td>
+              <td class="p-4 text-ink-soft">IEC 61215 / 61730</td>
+            </tr>
+            <tr class="border-t border-line">
+              <td class="p-4 font-semibold">Foundation</td>
+              <td class="p-4 text-ink-soft">Driven pile, 2.1–3.0 m embed</td>
+              <td class="p-4 text-ink-soft">Ballast ≤ 24 kg/m² added</td>
+              <td class="p-4 text-ink-soft">DNV-ST-0126</td>
+            </tr>
+            <tr class="border-t border-line bg-paper-dim/60">
+              <td class="p-4 font-semibold">Yield Modelling</td>
+              <td class="p-4 text-ink-soft">P50 / P90 / P99 certified</td>
+              <td class="p-4 text-ink-soft">P50 / P90</td>
+              <td class="p-4 text-ink-soft">IEC 61724-1</td>
+            </tr>
+            <tr class="border-t border-line">
+              <td class="p-4 font-semibold">Grid Interconnection</td>
+              <td class="p-4 text-ink-soft">Transmission-level study</td>
+              <td class="p-4 text-ink-soft">Distribution-level study</td>
+              <td class="p-4 text-ink-soft">IEEE 1547-2018</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="py-20 md:py-28 border-b border-line" id="faq">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div>
+        <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-signal">FAQ</span>
+        <h2 class="font-display font-semibold text-3xl md:text-[40px] tracking-tight mt-2">Solar questions.</h2>
+        <p class="text-ink-soft mt-4 max-w-xs">Anything else — the monitoring desk answers around the clock.</p>
+      </div>
+      <div class="lg:col-span-2 divide-y divide-line border-t border-b border-line">
+        <details class="group py-6"><summary class="flex items-center justify-between gap-4"><span class="font-display font-semibold text-lg">Do you install, or only engineer?</span><span class="accordion-icon text-signal text-2xl leading-none transition-transform">+</span></summary><p class="text-ink-soft mt-4 leading-relaxed max-w-2xl">We are the engineer of record and construction overseer. Installation is executed by vetted EPC partners working to our drawings, with EXA field engineers verifying every stage — pile refusal, torque, and string commissioning included.</p></details>
+        <details class="group py-6"><summary class="flex items-center justify-between gap-4"><span class="font-display font-semibold text-lg">Can my roof take a solar array?</span><span class="accordion-icon text-signal text-2xl leading-none transition-transform">+</span></summary><p class="text-ink-soft mt-4 leading-relaxed max-w-2xl">That's the first thing we check. A structural residual-capacity assessment of the host building precedes any rooftop layout — if the roof can't carry the system through its design life, we say so before you spend anything on modules.</p></details>
+        <details class="group py-6"><summary class="flex items-center justify-between gap-4"><span class="font-display font-semibold text-lg">How accurate are your yield forecasts?</span><span class="accordion-icon text-signal text-2xl leading-none transition-transform">+</span></summary><p class="text-ink-soft mt-4 leading-relaxed max-w-2xl">Fleet-wide, first-year production has landed within ±2.1% of our P50 forecasts. Every model is certified to IEC 61724-1 and backed by on-site pyranometer data where available.</p></details>
+        <details class="group py-6"><summary class="flex items-center justify-between gap-4"><span class="font-display font-semibold text-lg">What happens after commissioning?</span><span class="accordion-icon text-signal text-2xl leading-none transition-transform">+</span></summary><p class="text-ink-soft mt-4 leading-relaxed max-w-2xl">The array feeds our 24/7 monitoring desk. Underperformance against the yield model triggers a ticket within the hour, and every site receives an annual drone thermographic inspection.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="py-24 bg-blueprint grid-field-dark border-b border-black/30" id="contact">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10 text-center">
+      <span class="font-mono text-[12px] uppercase tracking-[0.2em] text-white/60">Start a Solar Project</span>
+      <h2 class="font-display font-semibold text-white text-3xl md:text-[48px] tracking-tight mt-3 mb-5">Put your site under the sun.</h2>
+      <p class="text-white/70 text-lg max-w-xl mx-auto mb-10">A site assessment tells you exactly what your land or roof can produce — before you commit to anything.</p>
+      <a href="#" class="inline-block bg-signal text-white px-10 py-5 font-mono text-[12px] uppercase tracking-[0.16em] hover:bg-white hover:text-blueprint transition-colors">Request Site Assessment</a>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="bg-ink text-white">
+  <div class="max-w-[1440px] mx-auto px-6 md:px-10 py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
+    <div class="md:col-span-2">
+      <div class="font-display font-semibold text-lg mb-1">EXA ENERGY</div>
+      <div class="font-mono text-[10px] uppercase tracking-[0.1em] text-white/40 mb-4">Exa Engineering (Private) Limited</div>
+      <p class="text-white/60 text-sm leading-relaxed max-w-xs">The renewable-energy practice of EXA Engineering. Same calculations, pointed at the sun.</p>
+    </div>
+    <div><h5 class="font-mono text-[11px] uppercase tracking-[0.15em] text-white/50 mb-4">Solar</h5><ul class="space-y-2 text-sm"><li><a href="#solutions" class="text-white/70 hover:text-signal transition-colors">Solutions</a></li><li><a href="#installations" class="text-white/70 hover:text-signal transition-colors">Installations</a></li><li><a href="#specs" class="text-white/70 hover:text-signal transition-colors">Specifications</a></li></ul></div>
+    <div><h5 class="font-mono text-[11px] uppercase tracking-[0.15em] text-white/50 mb-4">EXA</h5><ul class="space-y-2 text-sm"><li><a href="exa-engineering-redesign (1).html" class="text-white/70 hover:text-signal transition-colors">Main Site</a></li><li><a href="exa-engineering-redesign (1).html#team" class="text-white/70 hover:text-signal transition-colors">Leadership</a></li><li><a href="exa-engineering-redesign (1).html#locations" class="text-white/70 hover:text-signal transition-colors">Locations</a></li></ul></div>
+  </div>
+  <div class="border-t border-white/10">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-10 py-5 flex flex-col md:flex-row justify-between gap-2 font-mono text-[11px] uppercase tracking-[0.1em] text-white/40">
+      <span>© 2026 Exa Engineering (Private) Limited. All rights reserved.</span>
+      <span>DWG NO. EXA-PV-2026-002 · REV A</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 76, behavior: 'smooth' });
+        document.getElementById('mobile-menu').classList.remove('open');
+        document.getElementById('menu-backdrop').classList.add('hidden');
+      }
+    });
+  });
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('is-visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('section').forEach(s => { s.classList.add('reveal'); io.observe(s); });
+
+  const fmt = n => n.toLocaleString('en-US');
+  const countIO = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target; countIO.unobserve(el);
+      const to = parseInt(el.dataset.to, 10); const dur = 1400; const t0 = performance.now();
+      if (to === 0) { el.textContent = '0'; return; }
+      const step = (t) => {
+        const p = Math.min((t - t0) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = fmt(Math.round(to * eased));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.count').forEach(c => countIO.observe(c));
+
+  const menuBtn = document.getElementById('menu-btn');
+  const menuClose = document.getElementById('menu-close');
+  const menu = document.getElementById('mobile-menu');
+  const backdrop = document.getElementById('menu-backdrop');
+  const openMenu = () => { menu.classList.add('open'); backdrop.classList.remove('hidden'); };
+  const closeMenu = () => { menu.classList.remove('open'); backdrop.classList.add('hidden'); };
+  menuBtn.addEventListener('click', openMenu);
+  menuClose.addEventListener('click', closeMenu);
+  backdrop.addEventListener('click', closeMenu);
+
+  const engBg = document.getElementById('engineered-bg');
+  if (engBg) {
+    const onScroll = () => engBg.classList.toggle('show', window.scrollY > innerHeight * 0.5);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+</script>
+
+</body>
+</html>
