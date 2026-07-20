@@ -1,5 +1,9 @@
-// Process — four-stage delivery sequence (scroll-stacking sheets)
+// Process — four-stage delivery sequence.
+// Small screens get the original compact stacked list; tablet/desktop get the
+// scroll-stacking sheet sequence (ProcessStack), which only reads well at width.
+import { process } from "@/lib/content";
 import { Reveal } from "@/components/ui/Reveal";
+import { Stagger, StaggerItem } from "@/components/ui/Stagger";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { ProcessStack } from "./ProcessStack";
 
@@ -18,7 +22,21 @@ export function Process() {
           </p>
         </Reveal>
 
-        <ProcessStack />
+        {/* Small screens — original compact stacked list */}
+        <Stagger className="grid grid-cols-1 gap-6 md:hidden">
+          {process.map((stage) => (
+            <StaggerItem key={stage.stage} className="border-t border-line pt-6">
+              <div className="mb-3 font-mono text-sm text-signal">{stage.stage}</div>
+              <h3 className="mb-1.5 font-display text-lg font-semibold">{stage.title}</h3>
+              <p className="text-sm leading-relaxed text-ink-soft">{stage.desc}</p>
+            </StaggerItem>
+          ))}
+        </Stagger>
+
+        {/* Tablet & desktop — scroll-stacking sheet sequence */}
+        <div className="hidden md:block">
+          <ProcessStack />
+        </div>
       </div>
     </section>
   );

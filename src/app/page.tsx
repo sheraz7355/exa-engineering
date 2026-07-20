@@ -34,22 +34,18 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <PageShell nav={mainNav} cta={{ label: "Request Consultation", href: "/#contact" }} wordmark="ENGINEERING">
-      {/* Stack: the white hero pins while the dark data strip and 3D-model
-          showcase stick over it (black on white), then the lighter sections
-          slide over the model. */}
-      <StackDeck>
-        <StackPin>
-          <Hero />
-        </StackPin>
-        <StackPin>
-          <DataStrip />
-        </StackPin>
-        <StackPin>
-          <ModelShowcase />
-        </StackPin>
-        <TrustedBy />
-        <Services />
-      </StackDeck>
+      <Hero />
+
+      {/* The dark data-strip + 3D-model block slides up over the hero as a
+          rounded sheet — a clear dark-over-light stack that keeps the hero (and
+          its stats) fully visible instead of pinning it. */}
+      <div className="relative z-10 -mt-8 overflow-hidden rounded-t-[1.75rem] shadow-[0_-30px_60px_-40px_rgba(0,0,0,0.5)] md:-mt-12 md:rounded-t-[2.5rem]">
+        <DataStrip />
+        <ModelShowcase />
+      </div>
+
+      <TrustedBy />
+      <Services />
 
       <Sectors />
       <MetricsBand />
