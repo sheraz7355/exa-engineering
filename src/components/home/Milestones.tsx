@@ -13,17 +13,26 @@ export function Milestones() {
             Load paths that hold.
           </h2>
         </Reveal>
-        <div className="border-t border-line">
-          {milestones.map((milestone) => (
-            <div
-              key={milestone.title}
-              className="py-6 border-b border-line group hover:bg-paper transition-colors"
-            >
-              <h3 className="font-display font-semibold text-lg mb-1">{milestone.title}</h3>
-              <p className="text-ink-soft text-sm max-w-2xl">{milestone.desc}</p>
-            </div>
-          ))}
-        </div>
+        <ol className="max-w-3xl">
+          {milestones.map((milestone, i) => {
+            const isLast = i === milestones.length - 1;
+            return (
+              <li key={milestone.title} className="flex gap-x-5 md:gap-x-8">
+                {/* pipeline rail — orange junction node linked by a thin blueprint line */}
+                <div className="flex flex-col items-center" aria-hidden>
+                  <span className="relative mt-[7px] flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 border-signal bg-paper-dim">
+                    <span className="h-1 w-1 rounded-full bg-signal" />
+                  </span>
+                  {!isLast && <span className="w-px flex-1 bg-line" />}
+                </div>
+                <div className={isLast ? "" : "pb-10"}>
+                  <h3 className="font-display font-semibold text-lg mb-1">{milestone.title}</h3>
+                  <p className="text-ink-soft text-sm max-w-2xl">{milestone.desc}</p>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
       </div>
     </section>
   );
