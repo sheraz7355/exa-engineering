@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/Button";
+import { Magnetic } from "@/components/ui/Magnetic";
 import { MENU_EVENT } from "./ScrollToTop";
 import { cn } from "@/lib/cn";
 import type { NavItem } from "@/lib/site";
@@ -96,9 +97,11 @@ export function Header({
           {nav.map((item) => (
             <NavLink key={item.href} item={item} className={linkCls} />
           ))}
-          <Button href={cta.href} variant="dark" size="sm">
-            {cta.label}
-          </Button>
+          <Magnetic>
+            <Button href={cta.href} variant="dark" size="sm">
+              {cta.label}
+            </Button>
+          </Magnetic>
         </nav>
 
         <button

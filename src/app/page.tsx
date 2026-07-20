@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/PageShell";
+import { StackDeck, StackPin } from "@/components/ui/StackDeck";
 import { mainNav } from "@/lib/site";
 import { faqs } from "@/lib/content";
 import { JsonLd, servicesLd, faqLd, breadcrumbLd } from "@/lib/jsonld";
@@ -33,23 +34,49 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <PageShell nav={mainNav} cta={{ label: "Request Consultation", href: "/#contact" }} wordmark="ENGINEERING">
-      <Hero />
-      <DataStrip />
-      <ModelShowcase />
-      <TrustedBy />
-      <Services />
+      {/* Stack: the white hero pins while the dark data strip and 3D-model
+          showcase stick over it (black on white), then the lighter sections
+          slide over the model. */}
+      <StackDeck>
+        <StackPin>
+          <Hero />
+        </StackPin>
+        <StackPin>
+          <DataStrip />
+        </StackPin>
+        <StackPin>
+          <ModelShowcase />
+        </StackPin>
+        <TrustedBy />
+        <Services />
+      </StackDeck>
+
       <Sectors />
       <MetricsBand />
       <Process />
       <About />
-      <CaseStudy />
-      <Projects />
+
+      {/* Stack: the dark featured project pins while the project grid slides up
+          over it (the grid scrolls through, so every row stays visible). */}
+      <StackDeck>
+        <StackPin>
+          <CaseStudy />
+        </StackPin>
+        <Projects />
+      </StackDeck>
+
       <Milestones />
       <Testimonials />
       <Team />
       <Locations />
-      <FAQ />
-      <CTA />
+
+      {/* Finale: FAQ pins, the dark CTA sheet slides up over it, footer follows. */}
+      <StackDeck>
+        <StackPin>
+          <FAQ />
+        </StackPin>
+        <CTA />
+      </StackDeck>
       <JsonLd
         data={[servicesLd(), faqLd(faqs), breadcrumbLd([{ name: "Home", path: "/" }])]}
       />

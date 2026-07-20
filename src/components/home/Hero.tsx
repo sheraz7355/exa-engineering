@@ -5,6 +5,9 @@ import { heroStats } from "@/lib/content";
 import { Button } from "@/components/ui/Button";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { CountUp } from "@/components/ui/CountUp";
+import { Magnetic } from "@/components/ui/Magnetic";
+import { Parallax } from "@/components/ui/Parallax";
+import { MaskReveal } from "@/components/ui/MaskReveal";
 
 export function Hero() {
   return (
@@ -15,9 +18,13 @@ export function Hero() {
           <SectionLabel rule className="mb-5">
             Structural — Civil — Energy
           </SectionLabel>
-          <h1 className="mb-6 font-display text-[42px] font-semibold leading-[1.05] tracking-tight md:text-[64px] md:leading-[1.02]">
-            Engineering the future of infrastructure.
-          </h1>
+          <MaskReveal
+            as="h1"
+            trigger="mount"
+            delay={0.15}
+            text="Engineering the future of infrastructure."
+            className="mb-6 font-display text-[42px] font-semibold leading-[1.05] tracking-tight md:text-[64px] md:leading-[1.02]"
+          />
           <p className="mb-9 max-w-lg text-[17px] leading-relaxed text-ink-soft md:text-lg">
             Precision structural analysis, civil construction, and renewable-energy infrastructure
             for a rapidly evolving world. From roads, bridges, and underpasses to Pakistan&apos;s
@@ -25,12 +32,16 @@ export function Hero() {
             single beam is set.
           </p>
           <div className="mb-12 flex flex-wrap gap-4">
-            <Button href="/#contact" variant="primary">
-              Request Consultation
-            </Button>
-            <Button href="#model" variant="outline">
-              Explore the 3D Model
-            </Button>
+            <Magnetic>
+              <Button href="/#contact" variant="primary">
+                Request Consultation
+              </Button>
+            </Magnetic>
+            <Magnetic>
+              <Button href="#model" variant="outline">
+                Explore the 3D Model
+              </Button>
+            </Magnetic>
           </div>
           <div className="grid max-w-lg grid-cols-3 border-t border-line pt-6">
             {heroStats.map((stat, i) => (
@@ -46,7 +57,9 @@ export function Hero() {
           </div>
         </div>
 
-        <HeroDrawing />
+        <Parallax speed={0.14}>
+          <HeroDrawing />
+        </Parallax>
       </div>
     </section>
   );

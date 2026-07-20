@@ -5,7 +5,7 @@ import { SectionLabel } from "@/components/ui/SectionLabel";
 
 export function FAQ() {
   return (
-    <section id="faq" className="border-b border-line py-20 md:py-28">
+    <section id="faq" className="border-b border-line bg-paper py-20 md:py-28">
       <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-12 px-6 md:px-10 lg:grid-cols-3">
         <Reveal>
           <SectionLabel>FAQ</SectionLabel>

@@ -8,7 +8,7 @@ import { SectionLabel } from "@/components/ui/SectionLabel";
 
 export function Projects() {
   return (
-    <section id="projects" className="border-b border-line py-20 md:py-28">
+    <section id="projects" className="border-b border-line bg-paper py-20 md:py-28">
       <div className="mx-auto max-w-[1440px] px-6 md:px-10">
         <Reveal className="mb-12 flex items-end justify-between">
           <div>

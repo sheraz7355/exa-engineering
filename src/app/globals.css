@@ -176,6 +176,63 @@ body {
   animation-play-state: paused;
 }
 
+/* ============================================================
+   Process — scroll-stacking delivery sheets.
+   Core stacking is pure CSS `position: sticky` (runs on the
+   compositor — no main-thread work, no jank on low-end devices).
+   The subtle recede is a CSS scroll-driven animation where the
+   browser supports it, and degrades to a plain sticky deck where
+   it doesn't. Zero per-frame JavaScript either way.
+   ============================================================ */
+@media (min-width: 768px) {
+  .process-card {
+    position: sticky;
+    top: var(--stick, 96px);
+  }
+  /* Each sheet rises and settles on its own `view()` entry timeline as it
+     stacks in, then sits opaque while the next sheet covers it. Per-element
+     ranges need no calibration, so timing is correct at any viewport size. */
+  @supports (animation-timeline: view()) {
+    .process-card {
+      animation: process-enter linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+      transform-origin: top center;
+      will-change: transform;
+    }
+  }
+}
+@keyframes process-enter {
+  from {
+    transform: translateY(44px) scale(0.965);
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================================
+   Section sticky-stacking deck (see StackDeck.tsx). Each item
+   pins under the top; the next scrolls up and covers it.
+   ============================================================ */
+.stack-deck__item {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+}
+/* Scroll-through sections must paint ABOVE the pinned (sticky) items so they
+   cover them as they slide up. A sticky element is "positioned" and would
+   otherwise paint over static siblings regardless of DOM order. */
+.stack-deck > section {
+  position: relative;
+  z-index: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stack-deck__item {
+    position: static;
+  }
+}
+
 /* ---- native accordion (details/summary) ---- */
 details > summary {
   list-style: none;
@@ -217,6 +274,76 @@ footer {
   z-index: 1;
 }
 
+/* ============================================================
+   Cursor — the native arrow, tinted the vibrant signal orange
+   via a custom SVG bitmap. Native means pixel-perfect
+   responsiveness with zero JavaScript; text fields keep their
+   I-beam caret.
+   ============================================================ */
+html {
+  cursor: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M5%203L5%2020L9.5%2015.7L12.4%2021.8L15%2020.6L12.1%2014.8L18.5%2014.6Z'%20fill='%23ff4d1c'%20stroke='%23ffffff'%20stroke-width='1.3'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+      5 3,
+    auto;
+}
+a,
+button,
+summary,
+label,
+[role="button"],
+select {
+  cursor: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M5%203L5%2020L9.5%2015.7L12.4%2021.8L15%2020.6L12.1%2014.8L18.5%2014.6Z'%20fill='%23ff4d1c'%20stroke='%23ffffff'%20stroke-width='1.3'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+      5 3,
+    pointer;
+}
+input:not([type="button"]):not([type="submit"]):not([type="reset"]),
+textarea,
+[contenteditable="true"] {
+  cursor: text;
+}
+
+/* ============================================================
+   Page-transition curtain — a full-screen signal-orange panel
+   that wipes across the viewport on navigation (see
+   PageCurtain.tsx). The content settle is app/template.tsx.
+   ============================================================ */
+.page-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-signal);
+  will-change: transform;
+}
+.page-curtain__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  color: #fff;
+  text-align: center;
+  will-change: transform, opacity;
+}
+.page-curtain__mark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(5.5rem, 24vw, 20rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+.page-curtain__sub {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(0.8rem, 2.1vw, 1.5rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  /* optical centering against the wide right-side tracking */
+  padding-left: 0.42em;
+  opacity: 0.9;
+}
+
 /* ---- reduced motion ---- */
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -228,6 +355,12 @@ footer {
   }
   .floaty,
   .marquee-track {
+    animation: none;
+  }
+  .process-card {
+    position: static;
+  }
+  .process-card--recede {
     animation: none;
   }
 }

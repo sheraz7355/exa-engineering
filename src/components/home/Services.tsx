@@ -14,7 +14,7 @@ const icons: Record<Capability["icon"], typeof Building2> = {
 
 export function Services() {
   return (
-    <section id="services" className="border-b border-line py-20 md:py-28">
+    <section id="services" className="border-b border-line bg-paper py-20 md:py-28">
       <div className="mx-auto max-w-[1440px] px-6 md:px-10">
         <Reveal className="mb-14 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>

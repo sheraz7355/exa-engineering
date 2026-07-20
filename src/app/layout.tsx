@@ -5,6 +5,7 @@ import "./globals.css";
 import { siteConfig } from "@/lib/site";
 import { EngineeredBg } from "@/components/layout/EngineeredBg";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
+import { PageCurtain } from "@/components/layout/PageCurtain";
 import { JsonLd, organizationLd, websiteLd } from "@/lib/jsonld";
 
 const display = Space_Grotesk({
@@ -100,6 +101,7 @@ gtag('config', 'G-JCMNH9FNWS');`}
         </a>
         <EngineeredBg />
         <ScrollToTop />
+        <PageCurtain />
         {children}
         <JsonLd data={[organizationLd(), websiteLd()]} />
       </body>

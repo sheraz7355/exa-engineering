@@ -16,7 +16,7 @@ export type Stat = { value: number | string; suffix?: string; label: string };
 
 export const heroStats: Stat[] = [
   { value: 700, suffix: "+", label: "Projects Delivered" },
-  { value: 150, suffix: " MW", label: "Largest Single Project" },
+  { value: 150, suffix: "+", label: "Megawatts Delivered" },
   { value: "24/7", label: "Monitoring Desk" },
 ];
 
@@ -103,7 +103,7 @@ export const capabilityTable: CapabilityRow[] = [
 
 export const metrics: Stat[] = [
   { value: 700, suffix: "+", label: "Projects Delivered" },
-  { value: 150, suffix: " MW", label: "Largest Single Project" },
+  { value: 150, suffix: "+", label: "Megawatts Delivered" },
   { value: 9, suffix: "", label: "Industry Sectors Served" },
   { value: 0, suffix: "", label: "Structural Failures On Record" },
 ];

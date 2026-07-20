@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/layout/PageShell";
+import { StackDeck, StackPin } from "@/components/ui/StackDeck";
 import { solarNav } from "@/lib/site";
 import { solarFaqs } from "@/lib/content";
 import { JsonLd, solarServiceLd, faqLd, breadcrumbLd } from "@/lib/jsonld";
@@ -44,14 +45,30 @@ export default function SolarPage() {
     >
       <SolarHero />
       <SolarDataStrip />
-      <Solutions />
-      <FeaturedInstallation />
-      <SolarMetrics />
-      <SolarProcess />
-      <Installations />
+
+      {/* Stack: the white Solutions cards pin, the black featured installation
+          sticks over them, then metrics / process / installations slide over. */}
+      <StackDeck>
+        <StackPin>
+          <Solutions />
+        </StackPin>
+        <StackPin>
+          <FeaturedInstallation />
+        </StackPin>
+        <SolarMetrics />
+        <SolarProcess />
+        <Installations />
+      </StackDeck>
+
       <SpecsTable />
-      <SolarFAQ />
-      <SolarCTA />
+
+      {/* Finale: FAQ pins, the dark CTA sheet slides up over it, footer follows. */}
+      <StackDeck>
+        <StackPin>
+          <SolarFAQ />
+        </StackPin>
+        <SolarCTA />
+      </StackDeck>
       <JsonLd
         data={[
           solarServiceLd(),

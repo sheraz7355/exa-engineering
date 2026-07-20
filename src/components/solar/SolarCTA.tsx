@@ -5,7 +5,7 @@ import { siteConfig } from "@/lib/site";
 
 export function SolarCTA() {
   return (
-    <section id="contact" className="bg-blueprint grid-field-dark border-b border-black/30 py-24">
+    <section id="contact" className="relative z-10 overflow-hidden rounded-t-[1.75rem] border-b border-black/30 bg-blueprint py-24 shadow-[0_-30px_60px_-40px_rgba(0,0,0,0.55)] grid-field-dark md:rounded-t-[2.5rem]">
       <div className="mx-auto max-w-[1440px] px-6 md:px-10 text-center">
         <SectionLabel tone="light">Start a Solar Project</SectionLabel>
         <h2 className="font-display font-semibold text-white text-3xl md:text-[48px] tracking-tight mt-3 mb-5">
