@@ -55,7 +55,7 @@ export default function OgImage() {
           }}
         >
           <div style={{ display: "flex" }}>PAKISTAN · SINCE {siteConfig.founded}</div>
-          <div style={{ display: "flex", color: "#1B3A5C" }}>700+ PROJECTS · 150 MW LARGEST</div>
+          <div style={{ display: "flex", color: "#1B3A5C" }}>700+ PROJECTS · 150+ MW DELIVERED</div>
         </div>
       </div>
     ),

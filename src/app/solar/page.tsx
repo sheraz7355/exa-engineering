@@ -19,7 +19,7 @@ import { SolarCTA } from "@/components/solar/SolarCTA";
 export const metadata: Metadata = {
   title: "Solar Installation & PV Infrastructure",
   description:
-    "EXA Energy — the solar practice of Exa Engineering. Utility-scale, industrial, and commercial photovoltaic installations across Pakistan, from 1 MWp rooftops to the country's largest 150 MW field. Net metering, P50/P90 yield modelling, and 24/7 monitoring.",
+    "Exa Engineering's solar practice — utility-scale, industrial, and commercial photovoltaic installations across Pakistan, from 1 MWp rooftops to 150 MW utility-scale fields. Net metering, P50/P90 yield modelling, and 24/7 monitoring.",
   keywords: [
     "solar installation Pakistan",
     "utility-scale solar",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/solar" },
   openGraph: {
     url: "/solar",
-    title: "EXA Energy — Solar arrays, engineered to the panel",
+    title: "Exa Engineering — Solar arrays, engineered to the panel",
   },
 };
 
@@ -40,7 +40,7 @@ export default function SolarPage() {
     <PageShell
       nav={solarNav}
       cta={{ label: "Request Site Assessment", href: "#contact" }}
-      wordmark="ENERGY"
+      wordmark="ENGINEERING"
       footerVariant="solar"
     >
       <SolarHero />

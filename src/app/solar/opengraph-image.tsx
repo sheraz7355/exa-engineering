@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { exaMarkDataUri } from "@/lib/brand-svg";
 
-export const alt = "EXA Energy — Solar arrays, engineered to the panel";
+export const alt = "Exa Engineering — Solar arrays, engineered to the panel";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -26,7 +26,7 @@ export default function SolarOgImage() {
         <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
           <img src={exaMarkDataUri(96, "light")} width={96} height={96} alt="" />
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: 46, fontWeight: 700, color: "#F2F3EE", letterSpacing: -1 }}>EXA ENERGY</div>
+            <div style={{ fontSize: 46, fontWeight: 700, color: "#F2F3EE", letterSpacing: -1 }}>EXA ENGINEERING</div>
             <div style={{ fontSize: 15, color: "rgba(255,255,255,0.55)", letterSpacing: 4 }}>
               THE SOLAR PRACTICE OF EXA ENGINEERING
             </div>
@@ -48,7 +48,7 @@ export default function SolarOgImage() {
           }}
         >
           <div style={{ display: "flex" }}>UTILITY · INDUSTRIAL · ROOFTOP</div>
-          <div style={{ display: "flex", color: "#FF4D1C" }}>150 MW LARGEST · 700+ INSTALLS</div>
+          <div style={{ display: "flex", color: "#FF4D1C" }}>150+ MW DELIVERED · 700+ INSTALLS</div>
         </div>
       </div>
     ),

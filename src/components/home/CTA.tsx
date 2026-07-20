@@ -26,7 +26,7 @@ export function CTA() {
           </Button>
         </Magnetic>
         <p className="mt-8 font-mono text-[12px] uppercase tracking-[0.16em] text-white/60">
-          {siteConfig.contact.phone} — {siteConfig.contact.email}
+          {siteConfig.contact.phone} — <span className="normal-case">{siteConfig.contact.email}</span>
         </p>
       </Reveal>
     </section>

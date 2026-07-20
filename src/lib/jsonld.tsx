@@ -123,7 +123,7 @@ export function solarServiceLd() {
     provider: { "@id": ORG_ID },
     areaServed: { "@type": "Country", name: siteConfig.contact.country },
     description:
-      "Utility-scale, industrial, and commercial solar PV — from 1 MWp rooftops to Pakistan's largest 150 MW field, engineered to the panel with net metering and 24/7 monitoring.",
+      "Utility-scale, industrial, and commercial solar PV — from 1 MWp rooftops to 150 MW utility-scale fields, engineered to the panel with net metering and 24/7 monitoring.",
     url: `${siteConfig.url}/solar`,
   };
 }

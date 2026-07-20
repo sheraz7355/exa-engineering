@@ -43,7 +43,7 @@ export function Footer({ variant = "main" }: { variant?: "main" | "solar" }) {
             <div className="mb-1 flex items-center gap-3">
               <LogoMark size={30} tone="light" />
               <span className="font-display text-lg font-semibold">
-                EXA <span className="font-medium text-white/55">ENERGY</span>
+                EXA <span className="font-medium text-white/55">ENGINEERING</span>
               </span>
             </div>
             <div className="mb-4 font-mono text-[10px] uppercase tracking-[0.1em] text-white/60">

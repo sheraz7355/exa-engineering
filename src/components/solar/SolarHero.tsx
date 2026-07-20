@@ -17,7 +17,7 @@ export function SolarHero() {
             Solar arrays, engineered to the panel.
           </h1>
           <p className="mb-9 max-w-lg text-[17px] leading-relaxed text-ink-soft md:text-lg">
-            From 1 MWp rooftops to Pakistan&apos;s largest 150 MW field, Exa Engineering designs,
+            From 1 MWp rooftops to 150 MW utility-scale fields, Exa Engineering designs,
             validates, and oversees photovoltaic installations with the same structural rigor we
             bring to bridges — every rack, pile, and inverter pad calculated before ground is
             broken.

@@ -23,7 +23,7 @@ export const heroStats: Stat[] = [
 export const dataStrip: string[] = [
   "CERTIFIED ENGINEERING TEAM",
   "700+ SYSTEMS DELIVERED",
-  "PAKISTAN'S LARGEST 150 MW PROJECT",
+  "150+ MW DELIVERED",
   "OPERATIONS DESK: 24/7/365",
 ];
 
@@ -59,7 +59,7 @@ export const capabilities: Capability[] = [
     code: "SPEC / SOL",
     icon: "solar",
     title: "Solar & Renewable Energy",
-    desc: "Utility-scale and industrial photovoltaic arrays — from 1 MWp rooftops to Pakistan's largest 150 MW field, engineered to the panel with grid-tied integration and net metering.",
+    desc: "Utility-scale and industrial photovoltaic arrays — from 1 MWp rooftops to 150 MW utility-scale fields, engineered to the panel with grid-tied integration and net metering.",
     href: "/solar",
     cta: "Explore solar",
   },
@@ -154,7 +154,7 @@ export const standards: StandardItem[] = [
 ];
 
 export const aboutParagraph =
-  "Exa Engineering (Private) Limited is a broad-spectrum engineering firm delivering structural, civil-construction, and renewable-energy projects across Pakistan. Our certified engineers bring decades of combined experience — and we're proud to have delivered Pakistan's largest solar project at 150 MW, alongside 700+ installations across nine industry sectors.";
+  "Exa Engineering (Private) Limited is a broad-spectrum engineering firm delivering structural, civil-construction, and renewable-energy projects across Pakistan. Our certified engineers bring decades of combined experience — and we're proud to have delivered 150+ megawatts of solar, alongside 700+ installations across nine industry sectors.";
 
 /* ---- Projects (real, rebranded) ---- */
 
@@ -287,26 +287,22 @@ export const caseStudy = {
   quoteAuthor: "Operations Director — Bashir Sons Steel Industry",
 };
 
-export type Milestone = { year: string; title: string; desc: string };
+export type Milestone = { title: string; desc: string };
 
 export const milestones: Milestone[] = [
   {
-    year: "2009",
     title: "Founded in Lahore",
     desc: "Exa Engineering opens its practice, taking on structural and civil-construction commissions across Punjab.",
   },
   {
-    year: "2016",
     title: "First megawatt solar array",
     desc: "The firm moves into utility-scale renewable energy, engineering its first megawatt-class industrial PV installation.",
   },
   {
-    year: "2022",
-    title: "Pakistan's largest 150 MW project",
-    desc: "Exa delivers the country's largest single solar project at 150 MW, setting a national benchmark in renewable energy.",
+    title: "Megawatts delivered",
+    desc: "Exa scales into utility-scale renewable energy, delivering grid-tied solar arrays by the megawatt across the country.",
   },
   {
-    year: "2025",
     title: "700th project delivered",
     desc: "The firm passes 700 delivered installations across nine industry sectors, with a 24/7 monitoring desk online.",
   },
@@ -385,7 +381,7 @@ export type Faq = { q: string; a: string };
 export const faqs: Faq[] = [
   {
     q: "What project sizes do you take on?",
-    a: "From single-structure feasibility studies to Pakistan's largest 150 MW solar project. Scope is set in the first consultation, and every engagement gets the same peer-review process regardless of size.",
+    a: "From single-structure feasibility studies to 150 MW utility-scale solar fields. Scope is set in the first consultation, and every engagement gets the same peer-review process regardless of size.",
   },
   {
     q: "Which disciplines does Exa Engineering cover?",
@@ -406,14 +402,14 @@ export const faqs: Faq[] = [
 /* ------------------------------------------------------------------ */
 
 export const solarHeroStats: Stat[] = [
-  { value: 150, suffix: " MW", label: "Largest Project" },
+  { value: 150, suffix: "+", label: "Megawatts Delivered" },
   { value: 700, suffix: "+", label: "Installations" },
   { value: "99.2%", label: "Fleet Uptime" },
 ];
 
 export const solarDataStrip: string[] = [
   "IEC 61215 / 61730 COMPLIANT",
-  "150 MW LARGEST PROJECT",
+  "150+ MW DELIVERED",
   "P50 / P90 YIELD MODELLING",
   "MONITORING DESK: 24/7/365",
 ];
@@ -467,7 +463,7 @@ export const solarFeatured = {
 };
 
 export const solarMetrics: Stat[] = [
-  { value: 150, suffix: " MW", label: "Largest Project Delivered" },
+  { value: 150, suffix: "+", label: "Megawatts Delivered" },
   { value: 700, suffix: "+", label: "Systems Commissioned" },
   { value: 9, suffix: "", label: "Industry Sectors" },
   { value: 0, suffix: "", label: "Racking Failures On Record" },

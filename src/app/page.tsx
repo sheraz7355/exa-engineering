@@ -26,7 +26,7 @@ import { CTA } from "@/components/home/CTA";
 export const metadata: Metadata = {
   title: "Structural, Civil & Solar Engineering",
   description:
-    "Exa Engineering (Private) Limited — a broad engineering firm delivering roads, bridges, underpasses, buildings, and utility-scale solar across Pakistan. 700+ projects delivered, including the country's largest 150 MW solar installation.",
+    "Exa Engineering (Private) Limited — a broad engineering firm delivering roads, bridges, underpasses, buildings, and utility-scale solar across Pakistan. 700+ projects and 150+ MW of solar delivered.",
   alternates: { canonical: "/" },
   openGraph: { url: "/" },
 };
